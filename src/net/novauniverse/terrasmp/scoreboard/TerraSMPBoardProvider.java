@@ -1,0 +1,185 @@
+package net.novauniverse.terrasmp.scoreboard;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.UUID;
+
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
+
+import com.massivecraft.factions.Rel;
+import com.massivecraft.factions.entity.BoardColl;
+import com.massivecraft.factions.entity.Faction;
+import com.massivecraft.factions.entity.FactionColl;
+import com.massivecraft.factions.entity.MPlayer;
+import com.massivecraft.massivecore.ps.PS;
+
+import me.missionary.board.provider.BoardProvider;
+import net.novauniverse.terrasmp.utils.TerraSMPUtils;
+import net.zeeraa.novacore.commons.log.Log;
+import net.zeeraa.novacore.commons.tasks.Task;
+import net.zeeraa.novacore.spigot.module.NovaModule;
+import net.zeeraa.novacore.spigot.tasks.SimpleTask;
+
+public class TerraSMPBoardProvider extends NovaModule implements BoardProvider, Listener {
+	private static TerraSMPBoardProvider instance;
+	private HashMap<UUID, BoardData> boardDataMap;
+	private Task task;
+
+	public static TerraSMPBoardProvider getInstance() {
+		return instance;
+	}
+
+	@Override
+	public String getName() {
+		return "TerraSMPBoardProvider";
+	}
+
+	@Override
+	public void onLoad() {
+		TerraSMPBoardProvider.instance = this;
+		boardDataMap = new HashMap<>();
+		task = new SimpleTask(new Runnable() {
+			@Override
+			public void run() {
+				for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+					updatePlayer(player);
+				}
+			}
+		}, 10L);
+	}
+
+	@Override
+	public void onEnable() throws Exception {
+		Task.tryStartTask(task);
+	}
+
+	@Override
+	public void onDisable() throws Exception {
+		Task.tryStopTask(task);
+	}
+
+	@Override
+	public List<String> getLines(Player player) {
+		Log.trace("getLines(" + player + ")");
+
+		List<String> lines = new ArrayList<>();
+
+		BoardData data = boardDataMap.get(player.getUniqueId());
+
+		if (data != null) {
+			lines.add(data.getAtLocation());
+			lines.add(ChatColor.GOLD + "Facing: " + ChatColor.AQUA + TerraSMPUtils.getCardinalDirection(player));
+			lines.add("");
+			lines.add(data.getInFaction());
+			lines.add(data.getPower());
+			lines.add(data.getFactionPower());
+			lines.add("");
+		}
+
+		lines.add(ChatColor.YELLOW + "novauniverse.net");
+
+		return lines;
+	}
+
+	@Override
+	public String getTitle(Player player) {
+		return ChatColor.YELLOW + "" + ChatColor.BOLD + "TerraSMP";
+	}
+
+	@EventHandler(priority = EventPriority.LOWEST)
+	public void onPlayerJoin(PlayerJoinEvent e) {
+		updatePlayer(e.getPlayer());
+	}
+
+	@EventHandler(priority = EventPriority.MONITOR)
+	public void onPlayerJoin(PlayerQuitEvent e) {
+		boardDataMap.remove(e.getPlayer().getUniqueId());
+	}
+
+	public void updatePlayer(Player player) {
+		BoardData boardData;
+		if (boardDataMap.containsKey(player.getUniqueId())) {
+			boardData = boardDataMap.get(player.getUniqueId());
+		} else {
+			boardData = new BoardData();
+
+			boardDataMap.put(player.getUniqueId(), boardData);
+		}
+
+		MPlayer mPlayer = MPlayer.get(player);
+
+		Faction faction = BoardColl.get().getFactionAt(PS.valueOf(player.getLocation()));
+		Faction playerFaction = mPlayer.getFaction();
+
+		if (faction == null) {
+			boardData.setAtLocation(ChatColor.GOLD + "at: " + ChatColor.YELLOW + "Wilderness");
+		} else {
+			if (faction.getId().equalsIgnoreCase(FactionColl.get().getWarzone().getId())) {
+				boardData.setAtLocation(ChatColor.GOLD + "at: " + ChatColor.RED + "Warzone");
+			} else if (faction.getId().equalsIgnoreCase(FactionColl.get().getSafezone().getId())) {
+				boardData.setAtLocation(ChatColor.GOLD + "at: " + ChatColor.GREEN + "Safezone");
+			} else if (faction.getId().equalsIgnoreCase(FactionColl.get().getNone().getId())) {
+				boardData.setAtLocation(ChatColor.GOLD + "at: " + ChatColor.YELLOW + "Wilderness");
+			} else {
+				if (playerFaction != null) {
+					if (playerFaction.getId() != FactionColl.get().getNone().getId()) {
+						if (faction.getId() == playerFaction.getId()) {
+							boardData.setAtLocation(ChatColor.GOLD + "at: " + ChatColor.GREEN + faction.getName());
+						} else {
+							Rel rel = faction.getRelationTo(playerFaction);
+
+							ChatColor color = ChatColor.AQUA;
+
+							if (rel == Rel.ALLY) {
+								color = ChatColor.AQUA;
+							} else if (rel == Rel.ENEMY) {
+								color = ChatColor.RED;
+							} else if (rel == Rel.NEUTRAL) {
+								color = ChatColor.YELLOW;
+							}
+
+							boardData.setAtLocation(ChatColor.GOLD + "at: " + color + faction.getName());
+						}
+					} else {
+						boardData.setAtLocation(ChatColor.GOLD + "at: " + ChatColor.YELLOW + faction.getName());
+					}
+				} else {
+					boardData.setAtLocation(ChatColor.GOLD + "at: " + ChatColor.YELLOW + faction.getName());
+				}
+			}
+		}
+
+		String playerPower = ChatColor.GOLD + "pwr: " + ChatColor.AQUA + ((int) mPlayer.getPower()) + "/" + ((int) mPlayer.getPowerMax());
+		String factionPower = ChatColor.GOLD + "fp: " + ChatColor.AQUA;
+
+		boolean hasFaction = false;
+
+		if (playerFaction != null) {
+			if (playerFaction.getId() != FactionColl.get().getNone().getId()) {
+				hasFaction = true;
+			}
+		}
+
+		String in = ChatColor.GOLD + "Faction: ";
+
+		if (hasFaction) {
+			factionPower += ((int) playerFaction.getPower()) + "/" + ((int) playerFaction.getPowerMax());
+			in += ChatColor.AQUA + playerFaction.getName();
+		} else {
+			factionPower += "---/---";
+			in += ChatColor.RED + "No faction";
+		}
+
+		boardData.setInFaction(in);
+		boardData.setFactionPower(factionPower);
+		boardData.setPower(playerPower);
+	}
+}

@@ -1,0 +1,7 @@
+spawn_x: 0
+spawn_y: 100
+spawn_z: 0
+spawn_yaw: 0
+spawn_pitch: 0
+
+faction_nerf_player_limit: 10

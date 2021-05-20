@@ -1,0 +1,19 @@
+main: net.novauniverse.terrasmp.TerraSMP
+name: TerraSMP
+description: TerraSMP Plugin
+version: 1.0
+depend: [NovaCore, Factions, NovaMain]
+
+permissions:
+   terrasmp.sign.selectcontinent:
+      description: Access to creating continent selector signs
+      default: op
+   terrasmp.nojoinmessage:
+      description: Hide join message
+      default: false
+   terrasmp.noquitmessage:
+      description: Hide quit message
+      default: false
+
+commands:
+  suicide:
