@@ -1,6 +1,7 @@
 package net.novauniverse.terrasmp;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,8 +26,12 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import com.massivecraft.factions.entity.Faction;
 import com.massivecraft.factions.entity.FactionColl;
@@ -35,6 +40,7 @@ import com.massivecraft.factions.entity.MPlayer;
 import me.missionary.board.BoardManager;
 import me.missionary.board.settings.BoardSettings;
 import me.missionary.board.settings.ScoreDirection;
+import net.novauniverse.terrasmp.commands.invitetofaction.InviteToFactionCommand;
 import net.novauniverse.terrasmp.commands.map.MapCommand;
 import net.novauniverse.terrasmp.commands.removebed.RemoveBedCommand;
 import net.novauniverse.terrasmp.commands.systemmessage.SystemMessageCommand;
@@ -53,14 +59,17 @@ import net.novauniverse.terrasmp.scoreboard.TerraSMPBoardProvider;
 import net.novauniverse.terrasmp.utils.PlayerMessages;
 import net.zeeraa.novacore.commons.async.AsyncManager;
 import net.zeeraa.novacore.commons.log.Log;
+import net.zeeraa.novacore.commons.utils.JSONFileUtils;
 import net.zeeraa.novacore.spigot.command.CommandRegistry;
 import net.zeeraa.novacore.spigot.module.ModuleManager;
+import net.zeeraa.novacore.spigot.permission.PermissionRegistrator;
 
 public class TerraSMP extends JavaPlugin implements Listener {
 	private static TerraSMP instance;
 
 	private List<Continent> continents;
 	private File playerDataFolder;
+	private File systemMessageFile;
 
 	private String systemMessage;
 	private BossBar systemMessageBar;
@@ -88,12 +97,16 @@ public class TerraSMP extends JavaPlugin implements Listener {
 	public void removeSystemMessage() {
 		setSystemMessage(null);
 	}
-	
+
 	public BoardManager getBoardManager() {
 		return boardManager;
 	}
 
 	public void setSystemMessage(String systemMessage) {
+		this.setSystemMessage(systemMessage, true);
+	}
+
+	public void setSystemMessage(String systemMessage, boolean save) {
 		this.systemMessage = systemMessage;
 
 		if (systemMessage == null) {
@@ -115,6 +128,15 @@ public class TerraSMP extends JavaPlugin implements Listener {
 				}
 			}
 		}
+
+		if (save) {
+			try {
+				saveSystemMessageToFile(systemMessage == null ? "" : systemMessage);
+			} catch (IOException e) {
+				e.printStackTrace();
+				Log.error("TerraSMP", "Failed to save system message to file. " + e.getClass().getName() + " " + e.getMessage());
+			}
+		}
 	}
 
 	public String getSystemMessage() {
@@ -134,6 +156,14 @@ public class TerraSMP extends JavaPlugin implements Listener {
 		return null;
 	}
 
+	private void saveSystemMessageToFile(String message) throws IOException {
+		JSONObject massageJson = new JSONObject();
+
+		massageJson.put("message", message);
+
+		JSONFileUtils.saveJson(systemMessageFile, massageJson);
+	}
+
 	@Override
 	public void onEnable() {
 		TerraSMP.instance = this;
@@ -141,6 +171,7 @@ public class TerraSMP extends JavaPlugin implements Listener {
 
 		continents = new ArrayList<Continent>();
 		playerDataFolder = new File(getDataFolder().getPath() + File.separator + "userdata");
+		systemMessageFile = new File(getDataFolder().getPath() + File.separator + "system_message.json");
 
 		systemMessage = null;
 		systemMessageBar = null;
@@ -148,6 +179,10 @@ public class TerraSMP extends JavaPlugin implements Listener {
 		try {
 			FileUtils.forceMkdir(getDataFolder());
 			FileUtils.forceMkdir(playerDataFolder);
+
+			if (!systemMessageFile.exists()) {
+				saveSystemMessageToFile("");
+			}
 
 			saveDefaultConfig();
 		} catch (Exception e) {
@@ -189,6 +224,9 @@ public class TerraSMP extends JavaPlugin implements Listener {
 		CommandRegistry.registerCommand(new SystemMessageCommand());
 		CommandRegistry.registerCommand(new RemoveBedCommand());
 		CommandRegistry.registerCommand(new MapCommand());
+		CommandRegistry.registerCommand(new InviteToFactionCommand());
+
+		PermissionRegistrator.registerPermission("terrasmp.moderator", "Moderator permissions", PermissionDefault.OP);
 
 		FactionPowerNerf.getInstance().setPlayerLimit(getConfig().getInt("faction_nerf_player_limit"));
 		Log.info("TerraSMP", "Faction power nerf limit: " + FactionPowerNerf.getInstance().getPlayerLimit());
@@ -224,8 +262,15 @@ public class TerraSMP extends JavaPlugin implements Listener {
 
 		boardManager = new BoardManager(this, BoardSettings.builder().boardProvider(TerraSMPBoardProvider.getInstance()).scoreDirection(ScoreDirection.UP).build());
 
-		if (ModuleManager.moduleExists("net.novauniverse.main.modules.PreventingAleksaFromBreakingTheServer")) {
-			ModuleManager.disable("net.novauniverse.main.modules.PreventingAleksaFromBreakingTheServer");
+		try {
+			JSONObject systemMessageJson = JSONFileUtils.readJSONObjectFromFile(systemMessageFile);
+			String savedSystemMessage = systemMessageJson.getString("message");
+
+			if (savedSystemMessage.length() > 0) {
+				setSystemMessage(savedSystemMessage, false);
+			}
+		} catch (JSONException | IOException e) {
+			e.printStackTrace();
 		}
 	}
 
@@ -256,6 +301,13 @@ public class TerraSMP extends JavaPlugin implements Listener {
 					HiddenPlayers.getInstance().hidePlayer(player);
 					player.sendMessage(ChatColor.GOLD + "Please select your starter continent");
 					player.teleport(spawnLocation);
+
+					new BukkitRunnable() {
+						@Override
+						public void run() {
+							TerraSMPLabymodIntegration.getInstance();							
+						}
+					}.runTaskLater(TerraSMP.getInstance(), 20L);
 				}
 			}, 4L);
 		}

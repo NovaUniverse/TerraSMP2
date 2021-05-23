@@ -25,6 +25,8 @@ import me.missionary.board.provider.BoardProvider;
 import net.novauniverse.terrasmp.utils.TerraSMPUtils;
 import net.zeeraa.novacore.commons.log.Log;
 import net.zeeraa.novacore.commons.tasks.Task;
+import net.zeeraa.novacore.commons.utils.TextUtils;
+import net.zeeraa.novacore.spigot.NovaCore;
 import net.zeeraa.novacore.spigot.module.NovaModule;
 import net.zeeraa.novacore.spigot.tasks.SimpleTask;
 
@@ -32,6 +34,7 @@ public class TerraSMPBoardProvider extends NovaModule implements BoardProvider, 
 	private static TerraSMPBoardProvider instance;
 	private HashMap<UUID, BoardData> boardDataMap;
 	private Task task;
+	private String tspString;
 
 	public static TerraSMPBoardProvider getInstance() {
 		return instance;
@@ -46,9 +49,18 @@ public class TerraSMPBoardProvider extends NovaModule implements BoardProvider, 
 	public void onLoad() {
 		TerraSMPBoardProvider.instance = this;
 		boardDataMap = new HashMap<>();
+		tspString = ChatColor.DARK_GRAY + "Unknown";
 		task = new SimpleTask(new Runnable() {
 			@Override
 			public void run() {
+				double tps = -1;
+				try {
+					tps = NovaCore.getInstance().getVersionIndependentUtils().getRecentTps()[0];
+					tspString = ChatColor.GOLD + "TPS: " + TextUtils.formatTps(tps);
+				} catch (Exception e) {
+					Log.trace("TabList", "Failed to fetch server ping " + e.getClass().getName() + " " + e.getMessage());
+				}
+
 				for (Player player : Bukkit.getServer().getOnlinePlayers()) {
 					updatePlayer(player);
 				}
@@ -82,6 +94,9 @@ public class TerraSMPBoardProvider extends NovaModule implements BoardProvider, 
 			lines.add(data.getPower());
 			lines.add(data.getFactionPower());
 			lines.add("");
+			lines.add(tspString);
+			lines.add(data.getPing());
+
 		}
 
 		lines.add(ChatColor.YELLOW + "novauniverse.net");
@@ -91,7 +106,7 @@ public class TerraSMPBoardProvider extends NovaModule implements BoardProvider, 
 
 	@Override
 	public String getTitle(Player player) {
-		return ChatColor.YELLOW + "" + ChatColor.BOLD + "TerraSMP";
+		return ChatColor.AQUA + "" + ChatColor.BOLD + "TerraSMP";
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST)
@@ -120,19 +135,19 @@ public class TerraSMPBoardProvider extends NovaModule implements BoardProvider, 
 		Faction playerFaction = mPlayer.getFaction();
 
 		if (faction == null) {
-			boardData.setAtLocation(ChatColor.GOLD + "at: " + ChatColor.YELLOW + "Wilderness");
+			boardData.setAtLocation(ChatColor.GOLD + "At: " + ChatColor.YELLOW + "Wilderness");
 		} else {
 			if (faction.getId().equalsIgnoreCase(FactionColl.get().getWarzone().getId())) {
-				boardData.setAtLocation(ChatColor.GOLD + "at: " + ChatColor.RED + "Warzone");
+				boardData.setAtLocation(ChatColor.GOLD + "At: " + ChatColor.RED + "Warzone");
 			} else if (faction.getId().equalsIgnoreCase(FactionColl.get().getSafezone().getId())) {
-				boardData.setAtLocation(ChatColor.GOLD + "at: " + ChatColor.GREEN + "Safezone");
+				boardData.setAtLocation(ChatColor.GOLD + "At: " + ChatColor.GREEN + "Safezone");
 			} else if (faction.getId().equalsIgnoreCase(FactionColl.get().getNone().getId())) {
-				boardData.setAtLocation(ChatColor.GOLD + "at: " + ChatColor.YELLOW + "Wilderness");
+				boardData.setAtLocation(ChatColor.GOLD + "At: " + ChatColor.YELLOW + "Wilderness");
 			} else {
 				if (playerFaction != null) {
 					if (playerFaction.getId() != FactionColl.get().getNone().getId()) {
 						if (faction.getId() == playerFaction.getId()) {
-							boardData.setAtLocation(ChatColor.GOLD + "at: " + ChatColor.GREEN + faction.getName());
+							boardData.setAtLocation(ChatColor.GOLD + "At: " + ChatColor.GREEN + faction.getName());
 						} else {
 							Rel rel = faction.getRelationTo(playerFaction);
 
@@ -146,19 +161,19 @@ public class TerraSMPBoardProvider extends NovaModule implements BoardProvider, 
 								color = ChatColor.YELLOW;
 							}
 
-							boardData.setAtLocation(ChatColor.GOLD + "at: " + color + faction.getName());
+							boardData.setAtLocation(ChatColor.GOLD + "At: " + color + faction.getName());
 						}
 					} else {
-						boardData.setAtLocation(ChatColor.GOLD + "at: " + ChatColor.YELLOW + faction.getName());
+						boardData.setAtLocation(ChatColor.GOLD + "At: " + ChatColor.YELLOW + faction.getName());
 					}
 				} else {
-					boardData.setAtLocation(ChatColor.GOLD + "at: " + ChatColor.YELLOW + faction.getName());
+					boardData.setAtLocation(ChatColor.GOLD + "At: " + ChatColor.YELLOW + faction.getName());
 				}
 			}
 		}
 
-		String playerPower = ChatColor.GOLD + "pwr: " + ChatColor.AQUA + ((int) mPlayer.getPower()) + "/" + ((int) mPlayer.getPowerMax());
-		String factionPower = ChatColor.GOLD + "fp: " + ChatColor.AQUA;
+		String playerPower = ChatColor.GOLD + "Power: " + ChatColor.AQUA + ((int) mPlayer.getPower()) + "/" + ((int) mPlayer.getPowerMax());
+		String factionPower = ChatColor.GOLD + "Faction pwr: " + ChatColor.AQUA;
 
 		boolean hasFaction = false;
 
@@ -181,5 +196,8 @@ public class TerraSMPBoardProvider extends NovaModule implements BoardProvider, 
 		boardData.setInFaction(in);
 		boardData.setFactionPower(factionPower);
 		boardData.setPower(playerPower);
+		
+		int ping = NovaCore.getInstance().getVersionIndependentUtils().getPlayerPing(player);
+		boardData.setPing(ChatColor.GOLD + "Ping: " + TextUtils.formatPing(ping));
 	}
 }

@@ -5,12 +5,14 @@ public class BoardData {
 	private String inFaction;
 	private String power;
 	private String factionPower;
+	private String ping;
 
 	public BoardData() {
 		this.atLocation = "";
 		this.inFaction = "";
 		this.power = "";
 		this.factionPower = "";
+		this.ping = "";
 	}
 	
 	public void setAtLocation(String atLocation) {
@@ -43,5 +45,13 @@ public class BoardData {
 
 	public String getFactionPower() {
 		return factionPower;
+	}
+	
+	public String getPing() {
+		return ping;
+	}
+	
+	public void setPing(String ping) {
+		this.ping = ping;
 	}
 }
