@@ -13,6 +13,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 
 import net.novauniverse.terrasmp.TerraSMP;
 import net.novauniverse.terrasmp.data.Continent;
+import net.novauniverse.terrasmp.data.PlayerDataManager;
 import net.novauniverse.terrasmp.modules.labymod.TerraSMPLabymodIntegration;
 import net.zeeraa.novacore.commons.log.Log;
 import net.zeeraa.novacore.spigot.module.NovaModule;
@@ -30,7 +31,7 @@ public class ContinentSelectorSigns extends NovaModule implements Listener {
 				if (e.getLine(1).equalsIgnoreCase("gui")) {
 					e.setLine(0, ChatColor.BLUE + "[Select Continent]");
 					e.setLine(1, "Show GUI menu");
-					e.setLine(2, "Required LabyMod");
+					e.setLine(2, "Requires LabyMod");
 					e.setLine(3, "");
 					return;
 				}
@@ -52,7 +53,7 @@ public class ContinentSelectorSigns extends NovaModule implements Listener {
 
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = false)
 	public void onPlayerInteract(PlayerInteractEvent e) {
-		if (e.getAction() == Action.RIGHT_CLICK_BLOCK || e.getAction() == Action.LEFT_CLICK_BLOCK) {
+		if (e.getAction() == Action.RIGHT_CLICK_BLOCK /* || e.getAction() == Action.LEFT_CLICK_BLOCK */) {
 			if (e.getClickedBlock().getType() == Material.SIGN_POST || e.getClickedBlock().getType() == Material.WALL_SIGN) {
 				Log.trace(getName(), e.getPlayer() + " interacted with sign. " + e.getAction().name() + ". Canceled: " + e.isCancelled());
 
@@ -62,6 +63,11 @@ public class ContinentSelectorSigns extends NovaModule implements Listener {
 
 						if (sign.getLines()[0].equalsIgnoreCase(ChatColor.BLUE + "[Select Continent]")) {
 							Log.trace("ContinentSelectorSigns", e.getPlayer().getName() + " clicked a continent selector sign");
+
+							if (PlayerDataManager.getPlayerData(e.getPlayer().getUniqueId()).hasStarterContinent()) {
+								e.getPlayer().sendMessage(ChatColor.RED + "You have already selected your starter continent");
+								return;
+							}
 
 							if (sign.getLine(1).equalsIgnoreCase("Show GUI menu")) {
 								TerraSMPLabymodIntegration.getInstance().openContinentSelectorScreen(e.getPlayer());
