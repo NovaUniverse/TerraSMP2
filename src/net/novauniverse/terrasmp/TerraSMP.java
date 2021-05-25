@@ -57,6 +57,7 @@ import net.novauniverse.terrasmp.modules.hiddenplayers.HiddenPlayers;
 import net.novauniverse.terrasmp.modules.kdr.KDRManager;
 import net.novauniverse.terrasmp.modules.labymod.TerraSMPLabymodIntegration;
 import net.novauniverse.terrasmp.modules.nocrystalpvp.NoCrystalPvP;
+import net.novauniverse.terrasmp.modules.shop.TerraSMPShop;
 import net.novauniverse.terrasmp.scoreboard.TerraSMPBoardProvider;
 import net.novauniverse.terrasmp.utils.PlayerMessages;
 import net.zeeraa.novacore.commons.async.AsyncManager;
@@ -223,6 +224,7 @@ public class TerraSMP extends JavaPlugin implements Listener {
 		ModuleManager.loadModule(ContinentSelectorSigns.class, true);
 		ModuleManager.loadModule(TerraSMPBoardProvider.class, true);
 		ModuleManager.loadModule(KDRManager.class, true);
+		ModuleManager.loadModule(TerraSMPShop.class, true);
 
 		CommandRegistry.registerCommand(new SystemMessageCommand());
 		CommandRegistry.registerCommand(new RemoveBedCommand());
