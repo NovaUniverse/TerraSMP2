@@ -44,6 +44,7 @@ import net.novauniverse.terrasmp.commands.invitetofaction.InviteToFactionCommand
 import net.novauniverse.terrasmp.commands.map.MapCommand;
 import net.novauniverse.terrasmp.commands.removebed.RemoveBedCommand;
 import net.novauniverse.terrasmp.commands.systemmessage.SystemMessageCommand;
+import net.novauniverse.terrasmp.commands.wipeplayerdata.WipePlayerDataCommand;
 import net.novauniverse.terrasmp.data.Continent;
 import net.novauniverse.terrasmp.data.ContinentReader;
 import net.novauniverse.terrasmp.data.PlayerData;
@@ -53,6 +54,7 @@ import net.novauniverse.terrasmp.modules.disableeyeofender.DisableEyeOfEnder;
 import net.novauniverse.terrasmp.modules.dropplayerheads.DropPlayerHeadsOnKill;
 import net.novauniverse.terrasmp.modules.factionpowernerf.FactionPowerNerf;
 import net.novauniverse.terrasmp.modules.hiddenplayers.HiddenPlayers;
+import net.novauniverse.terrasmp.modules.kdr.KDRManager;
 import net.novauniverse.terrasmp.modules.labymod.TerraSMPLabymodIntegration;
 import net.novauniverse.terrasmp.modules.nocrystalpvp.NoCrystalPvP;
 import net.novauniverse.terrasmp.scoreboard.TerraSMPBoardProvider;
@@ -220,11 +222,13 @@ public class TerraSMP extends JavaPlugin implements Listener {
 		ModuleManager.loadModule(TerraSMPLabymodIntegration.class, true);
 		ModuleManager.loadModule(ContinentSelectorSigns.class, true);
 		ModuleManager.loadModule(TerraSMPBoardProvider.class, true);
+		ModuleManager.loadModule(KDRManager.class, true);
 
 		CommandRegistry.registerCommand(new SystemMessageCommand());
 		CommandRegistry.registerCommand(new RemoveBedCommand());
 		CommandRegistry.registerCommand(new MapCommand());
 		CommandRegistry.registerCommand(new InviteToFactionCommand());
+		CommandRegistry.registerCommand(new WipePlayerDataCommand());
 
 		PermissionRegistrator.registerPermission("terrasmp.moderator", "Moderator permissions", PermissionDefault.OP);
 
@@ -300,14 +304,17 @@ public class TerraSMP extends JavaPlugin implements Listener {
 				public void run() {
 					HiddenPlayers.getInstance().hidePlayer(player);
 					player.sendMessage(ChatColor.GOLD + "Please select your starter continent");
+					player.sendMessage(ChatColor.GOLD + "If you are using labymod the continent selector screen should open within 5 seconds");
 					player.teleport(spawnLocation);
 
 					new BukkitRunnable() {
 						@Override
 						public void run() {
-							TerraSMPLabymodIntegration.getInstance();							
+							if (!PlayerDataManager.getPlayerData(player.getUniqueId()).hasStarterContinent()) {
+								TerraSMPLabymodIntegration.getInstance().openContinentSelectorScreen(e.getPlayer());
+							}
 						}
-					}.runTaskLater(TerraSMP.getInstance(), 20L);
+					}.runTaskLater(TerraSMP.getInstance(), 100L);
 				}
 			}, 4L);
 		}
@@ -364,5 +371,21 @@ public class TerraSMP extends JavaPlugin implements Listener {
 				}
 			}
 		}
+	}
+
+	public static void setStarterContinent(Player player, Continent continent) {
+		PlayerDataManager.getPlayerData(player.getUniqueId()).setStarterContinent(continent.getName());
+		PlayerDataManager.savePlayerData(player.getUniqueId());
+
+		HiddenPlayers.getInstance().showPlayer(player);
+
+		Location location = continent.getRandomSpawnLocation();
+
+		if (location != null) {
+			player.teleport(location.add(0, 2, 0));
+			return;
+		}
+
+		player.sendMessage(ChatColor.RED + "Failed to find a spawn location. Please try again");
 	}
 }

@@ -2,7 +2,6 @@ package net.novauniverse.terrasmp.modules.continentselectorsigns;
 
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Sign;
 import org.bukkit.event.EventHandler;
@@ -14,8 +13,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 
 import net.novauniverse.terrasmp.TerraSMP;
 import net.novauniverse.terrasmp.data.Continent;
-import net.novauniverse.terrasmp.data.PlayerDataManager;
-import net.novauniverse.terrasmp.modules.hiddenplayers.HiddenPlayers;
+import net.novauniverse.terrasmp.modules.labymod.TerraSMPLabymodIntegration;
 import net.zeeraa.novacore.commons.log.Log;
 import net.zeeraa.novacore.spigot.module.NovaModule;
 
@@ -29,6 +27,14 @@ public class ContinentSelectorSigns extends NovaModule implements Listener {
 	public void onSignChange(SignChangeEvent e) {
 		if (e.getPlayer().hasPermission("terrasmp.sign.selectcontinent")) {
 			if (e.getLine(0).equalsIgnoreCase("[select continent]")) {
+				if (e.getLine(1).equalsIgnoreCase("gui")) {
+					e.setLine(0, ChatColor.BLUE + "[Select Continent]");
+					e.setLine(1, "Show GUI menu");
+					e.setLine(2, "Required LabyMod");
+					e.setLine(3, "");
+					return;
+				}
+
 				Continent continent = TerraSMP.getInstance().getContinent(e.getLine(1));
 
 				if (continent == null) {
@@ -57,21 +63,14 @@ public class ContinentSelectorSigns extends NovaModule implements Listener {
 						if (sign.getLines()[0].equalsIgnoreCase(ChatColor.BLUE + "[Select Continent]")) {
 							Log.trace("ContinentSelectorSigns", e.getPlayer().getName() + " clicked a continent selector sign");
 
+							if (sign.getLine(1).equalsIgnoreCase("Show GUI menu")) {
+								TerraSMPLabymodIntegration.getInstance().openContinentSelectorScreen(e.getPlayer());
+								return;
+							}
+
 							for (Continent continent : TerraSMP.getInstance().getContinents()) {
 								if (continent.getDisplayName().equalsIgnoreCase(sign.getLine(1))) {
-									PlayerDataManager.getPlayerData(e.getPlayer().getUniqueId()).setStarterContinent(continent.getName());
-									PlayerDataManager.savePlayerData(e.getPlayer().getUniqueId());
-
-									HiddenPlayers.getInstance().showPlayer(e.getPlayer());
-
-									Location location = continent.getRandomSpawnLocation();
-
-									if (location != null) {
-										e.getPlayer().teleport(location.add(0, 2, 0));
-										return;
-									}
-
-									e.getPlayer().sendMessage(ChatColor.RED + "Failed to find a spawn location. Please try again");
+									TerraSMP.setStarterContinent(e.getPlayer(), continent);
 
 									return;
 								}

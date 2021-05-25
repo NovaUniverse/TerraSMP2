@@ -2,7 +2,8 @@ main: net.novauniverse.terrasmp.TerraSMP
 name: TerraSMP
 description: TerraSMP Plugin
 version: 1.0
-depend: [NovaCore, Factions, NovaMain]
+
+depend: [NovaCore, Factions, NovaMain, LabyApi]
 
 permissions:
    terrasmp.sign.selectcontinent:

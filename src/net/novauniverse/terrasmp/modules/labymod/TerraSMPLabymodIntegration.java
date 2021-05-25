@@ -6,23 +6,31 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.json.JSONObject;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.massivecraft.factions.Rel;
 import com.massivecraft.factions.entity.Faction;
-import com.massivecraft.factions.entity.FactionColl;
 import com.massivecraft.factions.entity.MPlayer;
 
+import net.labymod.serverapi.bukkit.event.BukkitMessageReceiveEvent;
 import net.labymod.serverapi.common.widgets.WidgetScreen;
 import net.labymod.serverapi.common.widgets.components.widgets.ButtonWidget;
+import net.labymod.serverapi.common.widgets.components.widgets.ImageWidget;
+import net.labymod.serverapi.common.widgets.components.widgets.LabelWidget;
 import net.labymod.serverapi.common.widgets.util.Anchor;
 import net.labymod.serverapi.common.widgets.util.EnumScreenAction;
 import net.novauniverse.terrasmp.TerraSMP;
+import net.novauniverse.terrasmp.data.Continent;
+import net.novauniverse.terrasmp.data.PlayerData;
+import net.novauniverse.terrasmp.data.PlayerDataManager;
 import net.novauniverse.terrasmp.utils.LabyModProtocol;
+import net.zeeraa.novacore.commons.log.Log;
 import net.zeeraa.novacore.commons.tasks.Task;
 import net.zeeraa.novacore.spigot.module.NovaModule;
 import net.zeeraa.novacore.spigot.tasks.SimpleTask;
@@ -32,8 +40,9 @@ public class TerraSMPLabymodIntegration extends NovaModule implements Listener {
 
 	private static TerraSMPLabymodIntegration instance;
 
-	private static final String PLAYER_POWER_ICON = "https://novauniverse.net/cdn/terrasmp/placeholder_1.jpg";
-	private static final String FACTION_POWER_ICON = "https://novauniverse.net/cdn/terrasmp/placeholder_1.jpg";
+	public static final String KILLS_ICON = "https://novauniverse.net/cdn/terrasmp/icon_kills.png";
+	public static final String DEATHS_ICON = "https://novauniverse.net/cdn/terrasmp/icon_deaths.png";
+	public static final String SERVER_BANNER = "https://novauniverse.net/cdn/terrasmp/labymod_ingame_banner.png";
 
 	public static TerraSMPLabymodIntegration getInstance() {
 		return instance;
@@ -53,7 +62,7 @@ public class TerraSMPLabymodIntegration extends NovaModule implements Listener {
 			public void run() {
 				for (Player player : Bukkit.getServer().getOnlinePlayers()) {
 					sendPlayerTitles(player);
-					updatePowerDisplay(player);
+					updateKDR(player);
 				}
 			}
 		}, 100L);
@@ -69,24 +78,72 @@ public class TerraSMPLabymodIntegration extends NovaModule implements Listener {
 		Task.tryStopTask(task);
 	}
 
-	@EventHandler
+	@EventHandler(priority = EventPriority.NORMAL)
 	public void onPlayerJoin(PlayerJoinEvent e) {
 		this.sendTabImage(e.getPlayer());
 		this.sendPlayerTitles(e.getPlayer());
 		this.sendCurrentPlayingGamemode(e.getPlayer(), true, "TerraSMP");
 		this.setMiddleClickActions(e.getPlayer());
-		this.updatePowerDisplay(e.getPlayer());
+		this.updateKDR(e.getPlayer());
 		// this.sendWatermark(e.getPlayer(), true); // Breaks the tablist
 	}
 
-	@EventHandler
+	@EventHandler(priority = EventPriority.NORMAL)
 	public void onPlayerQuit(PlayerQuitEvent e) {
 		this.sendCurrentPlayingGamemode(e.getPlayer(), false, "TerraSMP");
 	}
 
+	@EventHandler(priority = EventPriority.NORMAL)
+	public void onBukkitMessageReceiveEvent(BukkitMessageReceiveEvent e) {
+		Log.trace(this.getName(), e.getClass().getName() + ": " + e.getPlayer().getName() + " | " + e.getMessageKey() + " | " + e.getMessageContent().toString());
+		try {
+			if (e.getMessageKey().equalsIgnoreCase("screen")) {
+				JSONObject json = new JSONObject(e.getMessageContent().toString());
+
+				if (json.has("id") && json.has("type")) {
+					if (json.getInt("id") == 1 && json.getInt("type") == 1) {
+						processCountrySelection(e.getPlayer(), json);
+					}
+				}
+			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			Log.warn(this.getName(), "Kicking " + e.getPlayer() + " since their plugin message caused a " + ex.getClass().getName() + " with message " + ex.getMessage());
+			e.getPlayer().kickPlayer(ChatColor.RED + "Invalid response from client");
+		}
+	}
+
+	private void processCountrySelection(Player player, JSONObject json) {
+		PlayerData data = PlayerDataManager.getPlayerData(player.getUniqueId());
+
+		if (json.has("widget_id")) {
+			int widgetId = json.getInt("widget_id");
+
+			if (widgetId >= 100) {
+				if (data.hasStarterContinent()) {
+					player.sendMessage(ChatColor.RED + "You have already selected your starter continent");
+					return;
+				}
+
+				int realId = widgetId - 100;
+
+				if (realId >= TerraSMP.getInstance().getContinents().size()) {
+					player.sendMessage(ChatColor.RED + "Failed to read continent id");
+					return;
+				}
+
+				Continent continent = TerraSMP.getInstance().getContinents().get(realId);
+
+				player.sendMessage(ChatColor.GOLD + "Selected " + ChatColor.AQUA + continent.getDisplayName() + ChatColor.GOLD + " as your starter continent");
+
+				TerraSMP.setStarterContinent(player, continent);
+			}
+		}
+	}
+
 	private void sendTabImage(Player player) {
 		JsonObject object = new JsonObject();
-		object.addProperty("url", "https://novauniverse.net/cdn/terrasmp/labymod_ingame_banner.png");
+		object.addProperty("url", SERVER_BANNER);
 		LabyModProtocol.sendLabyModMessage(player, "server_banner", object);
 	}
 
@@ -128,20 +185,14 @@ public class TerraSMPLabymodIntegration extends NovaModule implements Listener {
 		}
 	}
 
-	public void updatePowerDisplay(Player player) {
-		MPlayer mPlayer = MPlayer.get(player);
-		Faction faction = mPlayer.getFaction();
+	public void updateKDR(Player player) {
+		PlayerData data = PlayerDataManager.getPlayerData(player.getUniqueId());
 
-		int playerPower = 0;
-		int factionPower = 0;
+		int kills = data.getKills();
+		int deaths = data.getDeaths();
 
-		if (faction.getId() != FactionColl.get().getNone().getId()) {
-			playerPower = (int) Math.round(mPlayer.getPower());
-			factionPower = (int) Math.round(faction.getPower());
-		}
-
-		updateBalanceDisplay(player, EnumBalanceType.CASH, true, playerPower, PLAYER_POWER_ICON);
-		updateBalanceDisplay(player, EnumBalanceType.BANK, true, factionPower, FACTION_POWER_ICON);
+		updateBalanceDisplay(player, EnumBalanceType.CASH, true, kills, KILLS_ICON);
+		updateBalanceDisplay(player, EnumBalanceType.BANK, true, deaths, DEATHS_ICON);
 	}
 
 	public void updateBalanceDisplay(Player player, EnumBalanceType type, boolean visible, int balance, String icon) {
@@ -176,12 +227,35 @@ public class TerraSMPLabymodIntegration extends NovaModule implements Listener {
 
 		Anchor anchor = new Anchor(50, 50);
 
+		LabelWidget labelWidget1 = new LabelWidget(1, anchor, 0, -25, "Select your starter continent", 1, 1);
+		screen.addWidget(labelWidget1);
+
+		LabelWidget labelWidget2 = new LabelWidget(2, anchor, 0, -15, "this can't be changed later", 1, 0.5);
+		screen.addWidget(labelWidget2);
+
+		ImageWidget image = new ImageWidget(3, anchor, -100, -80, 200, 40, SERVER_BANNER);
+		screen.addWidget(image);
+
+		boolean alternating = false;
+		int lastY = 0;
+
 		for (int i = 0; i < TerraSMP.getInstance().getContinents().size(); i++) {
-			ButtonWidget button = new ButtonWidget(i + 1, anchor, -50, 20 * (i + 1), TerraSMP.getInstance().getContinents().get(i).getDisplayName(), 100, 20);
+			int x = alternating ? -110 : 10;
+			lastY = (int) (25 * Math.floor(i / 2));
+
+			alternating = !alternating;
+
+			String text = TerraSMP.getInstance().getContinents().get(i).getDisplayName();
+
+			ButtonWidget button = new ButtonWidget(i + 100, anchor, x, lastY, text, 100, 20);
 			button.setCloseScreenOnClick(true);
-			button.setValue(TerraSMP.getInstance().getContinents().get(i).getName());
-			button.setCloseScreenOnClick(true);
+			// button.setValue(TerraSMP.getInstance().getContinents().get(i).getName());
+			screen.addWidget(button);
 		}
+
+		ButtonWidget closeButton = new ButtonWidget(4, anchor, -50, lastY + 40, "Close", 100, 20);
+		closeButton.setCloseScreenOnClick(true);
+		screen.addWidget(closeButton);
 
 		JsonObject object = screen.toJsonObject(EnumScreenAction.OPEN);
 

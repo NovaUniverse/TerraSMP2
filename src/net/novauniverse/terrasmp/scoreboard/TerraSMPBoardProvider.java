@@ -80,7 +80,7 @@ public class TerraSMPBoardProvider extends NovaModule implements BoardProvider, 
 
 	@Override
 	public List<String> getLines(Player player) {
-		Log.trace("getLines(" + player + ")");
+		//Log.trace("getLines(" + player + ")");
 
 		List<String> lines = new ArrayList<>();
 

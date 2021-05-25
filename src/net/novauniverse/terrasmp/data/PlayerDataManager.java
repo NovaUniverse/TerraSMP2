@@ -17,7 +17,7 @@ public class PlayerDataManager {
 		loadedPlayerData.put(uuid, playerData);
 
 		savePlayerData(uuid);
-		
+
 		return playerData;
 	}
 
@@ -43,5 +43,12 @@ public class PlayerDataManager {
 		}
 
 		loadedPlayerData.clear();
+	}
+
+	public static void wipe(UUID uuid) {
+		PlayerDataManager.unloadPlayerData(uuid);
+		if (PlayerData.getPlayerDataFile(uuid).exists()) {
+			PlayerData.getPlayerDataFile(uuid).delete();
+		}
 	}
 }
