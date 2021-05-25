@@ -79,6 +79,10 @@
       <id>novauniverse-group</id>
       <url>https://nexus.novauniverse.net/repository/novauniverse-group/</url>
     </repository>
+    <repository>
+      <id>masecla-repo</id>
+      <url>https://masecla.dev/nexus/repository/maven-snapshots/</url>
+    </repository>
   </repositories>
   <dependencies>
     <dependency>
@@ -130,9 +134,15 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
+      <groupId>masecla</groupId>
+      <artifactId>VillagerGUIApi</artifactId>
+      <version>0.0.1-20210330.200030-1</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
       <groupId>io.netty</groupId>
       <artifactId>netty-all</artifactId>
-      <version>4.1.15.Final</version>
+      <version>4.1.42.Final</version>
       <scope>provided</scope>
     </dependency>
     <dependency>

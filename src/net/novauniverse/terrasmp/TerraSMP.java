@@ -43,6 +43,7 @@ import me.missionary.board.settings.ScoreDirection;
 import net.novauniverse.terrasmp.commands.invitetofaction.InviteToFactionCommand;
 import net.novauniverse.terrasmp.commands.map.MapCommand;
 import net.novauniverse.terrasmp.commands.removebed.RemoveBedCommand;
+import net.novauniverse.terrasmp.commands.shop.ShopCommand;
 import net.novauniverse.terrasmp.commands.systemmessage.SystemMessageCommand;
 import net.novauniverse.terrasmp.commands.wipeplayerdata.WipePlayerDataCommand;
 import net.novauniverse.terrasmp.data.Continent;
@@ -231,6 +232,7 @@ public class TerraSMP extends JavaPlugin implements Listener {
 		CommandRegistry.registerCommand(new MapCommand());
 		CommandRegistry.registerCommand(new InviteToFactionCommand());
 		CommandRegistry.registerCommand(new WipePlayerDataCommand());
+		CommandRegistry.registerCommand(new ShopCommand());
 
 		PermissionRegistrator.registerPermission("terrasmp.moderator", "Moderator permissions", PermissionDefault.OP);
 
