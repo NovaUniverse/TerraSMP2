@@ -22,6 +22,7 @@ import com.massivecraft.factions.entity.MPlayer;
 import com.massivecraft.massivecore.ps.PS;
 
 import me.missionary.board.provider.BoardProvider;
+import net.novauniverse.terrasmp.modules.terrasmptime.TerraSMPTime;
 import net.novauniverse.terrasmp.utils.TerraSMPUtils;
 import net.zeeraa.novacore.commons.log.Log;
 import net.zeeraa.novacore.commons.tasks.Task;
@@ -87,6 +88,8 @@ public class TerraSMPBoardProvider extends NovaModule implements BoardProvider, 
 		BoardData data = boardDataMap.get(player.getUniqueId());
 
 		if (data != null) {
+			lines.add(ChatColor.GOLD + "Date: " + ChatColor.AQUA + TerraSMPTime.getInstance().getScoreboardDate());
+			lines.add("");
 			lines.add(data.getAtLocation());
 			lines.add(ChatColor.GOLD + "Facing: " + ChatColor.AQUA + TerraSMPUtils.getCardinalDirection(player));
 			lines.add("");

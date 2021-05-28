@@ -3,11 +3,14 @@ package net.novauniverse.terrasmp.modules.terrasmptime;
 import java.io.File;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+
 import org.json.JSONObject;
 
 import net.novauniverse.terrasmp.TerraSMP;
 import net.zeeraa.novacore.commons.log.Log;
 import net.zeeraa.novacore.commons.tasks.Task;
+import net.zeeraa.novacore.commons.utils.DateTimeParser;
 import net.zeeraa.novacore.commons.utils.DateTimeUtils;
 import net.zeeraa.novacore.commons.utils.JSONFileUtils;
 import net.zeeraa.novacore.spigot.module.NovaModule;
@@ -24,6 +27,9 @@ public class TerraSMPTime extends NovaModule {
 	private Task updateTask;
 	private double multiplier;
 
+	private DateTimeParser scoreboardDateTimeParser;
+	private String scoreboardDate;
+
 	@Override
 	public String getName() {
 		return "TerraSMPTime";
@@ -39,6 +45,8 @@ public class TerraSMPTime extends NovaModule {
 		terraSMPStartDate = LocalDateTime.now();
 		startTime = LocalDateTime.now();
 		multiplier = 1.0;
+		scoreboardDateTimeParser = new DateTimeParser(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+		scoreboardDate = "1337-69-69";
 		updateTask = new SimpleTask(new Runnable() {
 			@Override
 			public void run() {
@@ -49,7 +57,7 @@ public class TerraSMPTime extends NovaModule {
 				long multipliedDif = (long) (dif * multiplier);
 
 				terraSMPCurrentDate = terraSMPStartDate.plusSeconds(multipliedDif);
-				
+
 				// long terraSmpStart = terraSMPStartDate.atZone(zoneId).toEpochSecond();
 				// long terraSmpNow = terraSmpStart + multipliedDif;
 
@@ -59,6 +67,8 @@ public class TerraSMPTime extends NovaModule {
 				// SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 				// terraSMPCurrentDate =
 				// DateTimeUtils.getDefaultDateTimeParser().dateFromString(format.format(date));
+
+				scoreboardDate = scoreboardDateTimeParser.dateToString(terraSMPCurrentDate);
 
 				Log.trace(getName(), "Now at " + DateTimeUtils.getDefaultDateTimeParser().dateToString(terraSMPCurrentDate));
 			}
@@ -104,5 +114,13 @@ public class TerraSMPTime extends NovaModule {
 
 	public static TerraSMPTime getInstance() {
 		return instance;
+	}
+
+	public LocalDateTime getTerraSMPCurrentDate() {
+		return terraSMPCurrentDate;
+	}
+
+	public String getScoreboardDate() {
+		return scoreboardDate;
 	}
 }
