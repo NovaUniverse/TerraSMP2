@@ -360,7 +360,7 @@ public class TerraSMP extends JavaPlugin implements Listener {
 			if (faction.getId().equalsIgnoreCase(FactionColl.get().getNone().getId()) || faction.getId().equalsIgnoreCase(FactionColl.get().getSafezone().getId()) || faction.getId().equalsIgnoreCase(FactionColl.get().getWarzone().getId())) {
 				randomRespawnLocation = true;
 			} else {
-				System.out.println("faction.getHome() : " + faction.getHome());
+				//System.out.println("faction.getHome() : " + faction.getHome());
 				if (faction.getHome() == null) {
 					randomRespawnLocation = true;
 				}
