@@ -22,7 +22,7 @@ public class InviteToFactionCommand extends NovaCommand {
 	@Override
 	public boolean execute(CommandSender sender, String commandLabel, String[] args) {
 		if (args.length > 0) {
-			Bukkit.getServer().dispatchCommand(sender, "f add " + args[0]);
+			Bukkit.getServer().dispatchCommand(sender, "f invite add " + args[0]);
 			return true;
 		} else {
 			sender.sendMessage(ChatColor.RED + "Please provide a player");

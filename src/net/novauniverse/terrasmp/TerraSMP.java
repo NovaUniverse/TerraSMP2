@@ -45,6 +45,7 @@ import net.novauniverse.terrasmp.commands.map.MapCommand;
 import net.novauniverse.terrasmp.commands.removebed.RemoveBedCommand;
 import net.novauniverse.terrasmp.commands.shop.ShopCommand;
 import net.novauniverse.terrasmp.commands.systemmessage.SystemMessageCommand;
+import net.novauniverse.terrasmp.commands.terrasmp.TerraSMPCommand;
 import net.novauniverse.terrasmp.commands.wipeplayerdata.WipePlayerDataCommand;
 import net.novauniverse.terrasmp.data.Continent;
 import net.novauniverse.terrasmp.data.ContinentReader;
@@ -59,6 +60,7 @@ import net.novauniverse.terrasmp.modules.kdr.KDRManager;
 import net.novauniverse.terrasmp.modules.labymod.TerraSMPLabymodIntegration;
 import net.novauniverse.terrasmp.modules.nocrystalpvp.NoCrystalPvP;
 import net.novauniverse.terrasmp.modules.shop.TerraSMPShop;
+import net.novauniverse.terrasmp.pluginmessagelisteners.WDLBlocker;
 import net.novauniverse.terrasmp.scoreboard.TerraSMPBoardProvider;
 import net.novauniverse.terrasmp.utils.PlayerMessages;
 import net.zeeraa.novacore.commons.async.AsyncManager;
@@ -233,6 +235,12 @@ public class TerraSMP extends JavaPlugin implements Listener {
 		CommandRegistry.registerCommand(new InviteToFactionCommand());
 		CommandRegistry.registerCommand(new WipePlayerDataCommand());
 		CommandRegistry.registerCommand(new ShopCommand());
+		CommandRegistry.registerCommand(new TerraSMPCommand());
+
+		WDLBlocker wdlBlocker = new WDLBlocker();
+
+		Bukkit.getServer().getMessenger().registerIncomingPluginChannel((Plugin) this, "WDL|INIT", wdlBlocker);
+		Bukkit.getServer().getMessenger().registerIncomingPluginChannel((Plugin) this, "wdl:init", wdlBlocker);
 
 		PermissionRegistrator.registerPermission("terrasmp.moderator", "Moderator permissions", PermissionDefault.OP);
 
