@@ -22,10 +22,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -33,8 +31,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.massivecraft.factions.entity.Faction;
-import com.massivecraft.factions.entity.FactionColl;
 import com.massivecraft.factions.entity.MPlayer;
 
 import me.missionary.board.BoardManager;
@@ -52,6 +48,7 @@ import net.novauniverse.terrasmp.data.ContinentReader;
 import net.novauniverse.terrasmp.data.PlayerData;
 import net.novauniverse.terrasmp.data.PlayerDataManager;
 import net.novauniverse.terrasmp.modules.continentselectorsigns.ContinentSelectorSigns;
+import net.novauniverse.terrasmp.modules.deathmessage.TerraSMPDeathMessage;
 import net.novauniverse.terrasmp.modules.disableeyeofender.DisableEyeOfEnder;
 import net.novauniverse.terrasmp.modules.dropplayerheads.DropPlayerHeadsOnKill;
 import net.novauniverse.terrasmp.modules.factionpowernerf.FactionPowerNerf;
@@ -59,6 +56,7 @@ import net.novauniverse.terrasmp.modules.hiddenplayers.HiddenPlayers;
 import net.novauniverse.terrasmp.modules.kdr.KDRManager;
 import net.novauniverse.terrasmp.modules.labymod.TerraSMPLabymodIntegration;
 import net.novauniverse.terrasmp.modules.nocrystalpvp.NoCrystalPvP;
+import net.novauniverse.terrasmp.modules.respawnmanager.TerraSMPRespawnManager;
 import net.novauniverse.terrasmp.modules.shop.TerraSMPShop;
 import net.novauniverse.terrasmp.modules.terrasmptime.TerraSMPTime;
 import net.novauniverse.terrasmp.pluginmessagelisteners.WDLBlocker;
@@ -230,6 +228,8 @@ public class TerraSMP extends JavaPlugin implements Listener {
 		ModuleManager.loadModule(KDRManager.class, true);
 		ModuleManager.loadModule(TerraSMPShop.class, true);
 		ModuleManager.loadModule(TerraSMPTime.class, true);
+		ModuleManager.loadModule(TerraSMPDeathMessage.class, true);
+		ModuleManager.loadModule(TerraSMPRespawnManager.class, true);
 
 		CommandRegistry.registerCommand(new SystemMessageCommand());
 		CommandRegistry.registerCommand(new RemoveBedCommand());
@@ -349,42 +349,6 @@ public class TerraSMP extends JavaPlugin implements Listener {
 		PlayerDataManager.unloadPlayerData(player.getUniqueId());
 
 		e.setQuitMessage(PlayerMessages.getLeaveMessage(player));
-	}
-
-	@EventHandler(priority = EventPriority.LOWEST)
-	public void onPlayerDeath(PlayerDeathEvent e) {
-		String newMessage = ChatColor.DARK_GRAY + "[" + ChatColor.RED + ChatColor.BOLD + "*" + ChatColor.RESET + ChatColor.DARK_GRAY + "] " + ChatColor.RED + e.getDeathMessage();
-		e.setDeathMessage(newMessage);
-	}
-
-	@EventHandler
-	public void onPlayerRespawn(PlayerRespawnEvent e) {
-		Player player = e.getPlayer();
-		if (!e.isBedSpawn()) {
-			MPlayer mPlayer = MPlayer.get(player);
-
-			Faction faction = mPlayer.getFaction();
-
-			boolean randomRespawnLocation = false;
-
-			if (faction.getId().equalsIgnoreCase(FactionColl.get().getNone().getId()) || faction.getId().equalsIgnoreCase(FactionColl.get().getSafezone().getId()) || faction.getId().equalsIgnoreCase(FactionColl.get().getWarzone().getId())) {
-				randomRespawnLocation = true;
-			} else {
-				//System.out.println("faction.getHome() : " + faction.getHome());
-				if (faction.getHome() == null) {
-					randomRespawnLocation = true;
-				}
-			}
-
-			if (randomRespawnLocation) {
-				Continent continent = getContinent(PlayerDataManager.getPlayerData(player.getUniqueId()).getStarterContinent());
-
-				if (continent != null) {
-					Location location = continent.getRandomSpawnLocation();
-					e.setRespawnLocation(location.add(0, 2, 0));
-				}
-			}
-		}
 	}
 
 	public static void setStarterContinent(Player player, Continent continent) {
