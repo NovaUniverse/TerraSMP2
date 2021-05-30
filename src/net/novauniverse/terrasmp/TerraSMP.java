@@ -365,5 +365,6 @@ public class TerraSMP extends JavaPlugin implements Listener {
 		}
 
 		player.sendMessage(ChatColor.RED + "Failed to find a spawn location. Please try again");
+		Log.warn("TerraSMP", "Failed to get spawn location for player " + player.getName() + " in continent " + continent.getName());
 	}
 }
