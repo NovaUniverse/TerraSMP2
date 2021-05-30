@@ -9,6 +9,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import net.novauniverse.terrasmp.TerraSMP;
+import net.novauniverse.terrasmp.data.ContinentIndex;
 import net.novauniverse.terrasmp.data.PlayerData;
 import net.novauniverse.terrasmp.data.PlayerDataManager;
 import net.novauniverse.terrasmp.modules.hiddenplayers.HiddenPlayers;
@@ -28,7 +29,7 @@ public class InitialJoinManager extends NovaModule implements Listener {
 
 		PlayerData playerData = PlayerDataManager.getPlayerData(player.getUniqueId());
 
-		if (TerraSMP.getInstance().getContinent(playerData.getStarterContinent()) == null) {
+		if (ContinentIndex.getContinent(playerData.getStarterContinent()) == null) {
 			AsyncManager.runSync(new Runnable() {
 				@Override
 				public void run() {

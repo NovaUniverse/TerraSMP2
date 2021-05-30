@@ -11,8 +11,8 @@ import com.massivecraft.factions.entity.Faction;
 import com.massivecraft.factions.entity.FactionColl;
 import com.massivecraft.factions.entity.MPlayer;
 
-import net.novauniverse.terrasmp.TerraSMP;
 import net.novauniverse.terrasmp.data.Continent;
+import net.novauniverse.terrasmp.data.ContinentIndex;
 import net.novauniverse.terrasmp.data.PlayerDataManager;
 import net.zeeraa.novacore.spigot.module.NovaModule;
 
@@ -42,7 +42,7 @@ public class TerraSMPRespawnManager extends NovaModule implements Listener {
 			}
 
 			if (randomRespawnLocation) {
-				Continent continent = TerraSMP.getInstance().getContinent(PlayerDataManager.getPlayerData(player.getUniqueId()).getStarterContinent());
+				Continent continent = ContinentIndex.getContinent(PlayerDataManager.getPlayerData(player.getUniqueId()).getStarterContinent());
 
 				if (continent != null) {
 					Location location = continent.getRandomSpawnLocation();

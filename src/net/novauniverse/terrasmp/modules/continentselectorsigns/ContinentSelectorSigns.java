@@ -13,6 +13,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 
 import net.novauniverse.terrasmp.TerraSMP;
 import net.novauniverse.terrasmp.data.Continent;
+import net.novauniverse.terrasmp.data.ContinentIndex;
 import net.novauniverse.terrasmp.data.PlayerDataManager;
 import net.novauniverse.terrasmp.modules.labymod.TerraSMPLabymodIntegration;
 import net.zeeraa.novacore.commons.log.Log;
@@ -36,7 +37,7 @@ public class ContinentSelectorSigns extends NovaModule implements Listener {
 					return;
 				}
 
-				Continent continent = TerraSMP.getInstance().getContinent(e.getLine(1));
+				Continent continent = ContinentIndex.getContinent(e.getLine(1));
 
 				if (continent == null) {
 					e.getPlayer().sendMessage(ChatColor.RED + "Could not find continent " + e.getLine(1));
@@ -74,7 +75,7 @@ public class ContinentSelectorSigns extends NovaModule implements Listener {
 								return;
 							}
 
-							for (Continent continent : TerraSMP.getInstance().getContinents()) {
+							for (Continent continent : ContinentIndex.getContinents()) {
 								if (continent.getDisplayName().equalsIgnoreCase(sign.getLine(1))) {
 									TerraSMP.setStarterContinent(e.getPlayer(), continent);
 

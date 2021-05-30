@@ -1,11 +1,6 @@
 package net.novauniverse.terrasmp;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.annotation.Nullable;
-
 import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -28,7 +23,7 @@ import net.novauniverse.terrasmp.commands.systemmessage.SystemMessageCommand;
 import net.novauniverse.terrasmp.commands.terrasmp.TerraSMPCommand;
 import net.novauniverse.terrasmp.commands.wipeplayerdata.WipePlayerDataCommand;
 import net.novauniverse.terrasmp.data.Continent;
-import net.novauniverse.terrasmp.data.ContinentReader;
+import net.novauniverse.terrasmp.data.ContinentIndex;
 import net.novauniverse.terrasmp.data.PlayerDataManager;
 import net.novauniverse.terrasmp.modules.continentselectorsigns.ContinentSelectorSigns;
 import net.novauniverse.terrasmp.modules.deathmessage.TerraSMPDeathMessage;
@@ -56,7 +51,6 @@ import net.zeeraa.novacore.spigot.permission.PermissionRegistrator;
 public class TerraSMP extends JavaPlugin implements Listener {
 	private static TerraSMP instance;
 
-	private List<Continent> continents;
 	private File playerDataFolder;
 
 	private Location spawnLocation;
@@ -65,10 +59,6 @@ public class TerraSMP extends JavaPlugin implements Listener {
 
 	public static TerraSMP getInstance() {
 		return instance;
-	}
-
-	public List<Continent> getContinents() {
-		return continents;
 	}
 
 	public Location getSpawnLocation() {
@@ -83,25 +73,11 @@ public class TerraSMP extends JavaPlugin implements Listener {
 		return boardManager;
 	}
 
-	@Nullable
-	public Continent getContinent(String name) {
-		if (name != null) {
-			for (Continent continent : continents) {
-				if (continent.getName().equalsIgnoreCase(name)) {
-					return continent;
-				}
-			}
-		}
-
-		return null;
-	}
-
 	@Override
 	public void onEnable() {
 		TerraSMP.instance = this;
 		saveDefaultConfig();
 
-		continents = new ArrayList<Continent>();
 		playerDataFolder = new File(getDataFolder().getPath() + File.separator + "userdata");
 
 		try {
@@ -120,8 +96,7 @@ public class TerraSMP extends JavaPlugin implements Listener {
 		File continentFile = new File(getDataFolder().getPath() + File.separator + "continents.json");
 		if (continentFile.exists()) {
 			try {
-				continents = ContinentReader.readContinents(continentFile, Bukkit.getServer().getWorlds().get(0));
-				Log.info("TerraSMP", continents.size() + " continents loaded");
+				ContinentIndex.loadContinents(continentFile, Bukkit.getServer().getWorlds().get(0));
 			} catch (Exception e) {
 				Log.fatal("Failed to read continent file " + continentFile.getPath() + ". Caused by " + e.getClass().getName());
 				e.printStackTrace();
@@ -153,7 +128,7 @@ public class TerraSMP extends JavaPlugin implements Listener {
 		ModuleManager.loadModule(InitialJoinManager.class, true);
 		ModuleManager.loadModule(PlayerDataGarbageCollector.class, true);
 		ModuleManager.loadModule(TerraSMPJoinQuitMessage.class, true);
-		
+
 		CommandRegistry.registerCommand(new SystemMessageCommand());
 		CommandRegistry.registerCommand(new RemoveBedCommand());
 		CommandRegistry.registerCommand(new MapCommand());
@@ -163,7 +138,7 @@ public class TerraSMP extends JavaPlugin implements Listener {
 		CommandRegistry.registerCommand(new TerraSMPCommand());
 
 		new SuicideCommand();
-		
+
 		WDLBlocker wdlBlocker = new WDLBlocker();
 
 		Bukkit.getServer().getMessenger().registerIncomingPluginChannel((Plugin) this, "WDL|INIT", wdlBlocker);
