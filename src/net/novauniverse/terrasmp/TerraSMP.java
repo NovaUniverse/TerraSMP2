@@ -58,6 +58,7 @@ import net.novauniverse.terrasmp.modules.labymod.TerraSMPLabymodIntegration;
 import net.novauniverse.terrasmp.modules.nocrystalpvp.NoCrystalPvP;
 import net.novauniverse.terrasmp.modules.respawnmanager.TerraSMPRespawnManager;
 import net.novauniverse.terrasmp.modules.shop.TerraSMPShop;
+import net.novauniverse.terrasmp.modules.systemmessage.TerraSMPSystemMessage;
 import net.novauniverse.terrasmp.modules.terrasmptime.TerraSMPTime;
 import net.novauniverse.terrasmp.pluginmessagelisteners.WDLBlocker;
 import net.novauniverse.terrasmp.scoreboard.TerraSMPBoardProvider;
@@ -74,10 +75,6 @@ public class TerraSMP extends JavaPlugin implements Listener {
 
 	private List<Continent> continents;
 	private File playerDataFolder;
-	private File systemMessageFile;
-
-	private String systemMessage;
-	private BossBar systemMessageBar;
 
 	private Location spawnLocation;
 
@@ -99,53 +96,8 @@ public class TerraSMP extends JavaPlugin implements Listener {
 		return playerDataFolder;
 	}
 
-	public void removeSystemMessage() {
-		setSystemMessage(null);
-	}
-
 	public BoardManager getBoardManager() {
 		return boardManager;
-	}
-
-	public void setSystemMessage(String systemMessage) {
-		this.setSystemMessage(systemMessage, true);
-	}
-
-	public void setSystemMessage(String systemMessage, boolean save) {
-		this.systemMessage = systemMessage;
-
-		if (systemMessage == null) {
-			if (systemMessageBar != null) {
-				systemMessageBar.removeAll();
-				systemMessageBar = null;
-			}
-		} else {
-			if (systemMessageBar == null) {
-				systemMessageBar = Bukkit.getServer().createBossBar("System Message", BarColor.BLUE, BarStyle.SOLID);
-			}
-
-			systemMessageBar.setVisible(true);
-			systemMessageBar.setTitle(ChatColor.RED + "" + ChatColor.BOLD + "System Message: " + ChatColor.RESET + ChatColor.translateAlternateColorCodes('&', systemMessage));
-
-			for (Player player : Bukkit.getServer().getOnlinePlayers()) {
-				if (!systemMessageBar.getPlayers().contains(player)) {
-					systemMessageBar.addPlayer(player);
-				}
-			}
-		}
-
-		if (save) {
-			try {
-				saveSystemMessageToFile(systemMessage == null ? "" : systemMessage);
-			} catch (IOException e) {
-				e.printStackTrace();
-				Log.error("TerraSMP", "Failed to save system message to file. " + e.getClass().getName() + " " + e.getMessage());
-			}
-		}
-	}
-
-	public String getSystemMessage() {
-		return systemMessage;
 	}
 
 	@Nullable
@@ -161,13 +113,7 @@ public class TerraSMP extends JavaPlugin implements Listener {
 		return null;
 	}
 
-	private void saveSystemMessageToFile(String message) throws IOException {
-		JSONObject massageJson = new JSONObject();
-
-		massageJson.put("message", message);
-
-		JSONFileUtils.saveJson(systemMessageFile, massageJson);
-	}
+	
 
 	@Override
 	public void onEnable() {
@@ -176,18 +122,12 @@ public class TerraSMP extends JavaPlugin implements Listener {
 
 		continents = new ArrayList<Continent>();
 		playerDataFolder = new File(getDataFolder().getPath() + File.separator + "userdata");
-		systemMessageFile = new File(getDataFolder().getPath() + File.separator + "system_message.json");
+		
 
-		systemMessage = null;
-		systemMessageBar = null;
-
+		
 		try {
 			FileUtils.forceMkdir(getDataFolder());
 			FileUtils.forceMkdir(playerDataFolder);
-
-			if (!systemMessageFile.exists()) {
-				saveSystemMessageToFile("");
-			}
 
 			saveDefaultConfig();
 		} catch (Exception e) {
@@ -230,6 +170,7 @@ public class TerraSMP extends JavaPlugin implements Listener {
 		ModuleManager.loadModule(TerraSMPTime.class, true);
 		ModuleManager.loadModule(TerraSMPDeathMessage.class, true);
 		ModuleManager.loadModule(TerraSMPRespawnManager.class, true);
+		ModuleManager.loadModule(TerraSMPSystemMessage.class, true);
 
 		CommandRegistry.registerCommand(new SystemMessageCommand());
 		CommandRegistry.registerCommand(new RemoveBedCommand());
@@ -280,16 +221,7 @@ public class TerraSMP extends JavaPlugin implements Listener {
 
 		boardManager = new BoardManager(this, BoardSettings.builder().boardProvider(TerraSMPBoardProvider.getInstance()).scoreDirection(ScoreDirection.UP).build());
 
-		try {
-			JSONObject systemMessageJson = JSONFileUtils.readJSONObjectFromFile(systemMessageFile);
-			String savedSystemMessage = systemMessageJson.getString("message");
-
-			if (savedSystemMessage.length() > 0) {
-				setSystemMessage(savedSystemMessage, false);
-			}
-		} catch (JSONException | IOException e) {
-			e.printStackTrace();
-		}
+		
 	}
 
 	@Override
@@ -303,12 +235,6 @@ public class TerraSMP extends JavaPlugin implements Listener {
 	@EventHandler(priority = EventPriority.HIGH)
 	public void onPlayerJoin(PlayerJoinEvent e) {
 		Player player = e.getPlayer();
-
-		if (systemMessageBar != null) {
-			if (!systemMessageBar.getPlayers().contains(player)) {
-				systemMessageBar.addPlayer(player);
-			}
-		}
 
 		PlayerData playerData = PlayerDataManager.getPlayerData(player.getUniqueId());
 
@@ -339,12 +265,6 @@ public class TerraSMP extends JavaPlugin implements Listener {
 	@EventHandler(priority = EventPriority.HIGH)
 	public void onPlayerQuit(PlayerQuitEvent e) {
 		Player player = e.getPlayer();
-
-		if (systemMessageBar != null) {
-			if (systemMessageBar.getPlayers().contains(player)) {
-				systemMessageBar.removePlayer(player);
-			}
-		}
 
 		PlayerDataManager.unloadPlayerData(player.getUniqueId());
 

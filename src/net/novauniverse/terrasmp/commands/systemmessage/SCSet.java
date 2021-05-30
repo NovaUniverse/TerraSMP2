@@ -4,7 +4,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.permissions.PermissionDefault;
 
-import net.novauniverse.terrasmp.TerraSMP;
+import net.novauniverse.terrasmp.modules.systemmessage.TerraSMPSystemMessage;
 import net.zeeraa.novacore.spigot.command.AllowedSenders;
 import net.zeeraa.novacore.spigot.command.NovaSubCommand;
 
@@ -32,7 +32,7 @@ public class SCSet extends NovaSubCommand {
 				text += s + " ";
 			}
 
-			TerraSMP.getInstance().setSystemMessage(text);
+			TerraSMPSystemMessage.getInstance().setSystemMessage(text);
 
 			sender.sendMessage(ChatColor.GREEN + "System message set to: " + ChatColor.AQUA + ChatColor.translateAlternateColorCodes('&', text));
 		}
