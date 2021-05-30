@@ -105,8 +105,6 @@ public class TerraSMP extends JavaPlugin implements Listener {
 		return null;
 	}
 
-	
-
 	@Override
 	public void onEnable() {
 		TerraSMP.instance = this;
@@ -114,9 +112,7 @@ public class TerraSMP extends JavaPlugin implements Listener {
 
 		continents = new ArrayList<Continent>();
 		playerDataFolder = new File(getDataFolder().getPath() + File.separator + "userdata");
-		
 
-		
 		try {
 			FileUtils.forceMkdir(getDataFolder());
 			FileUtils.forceMkdir(playerDataFolder);
@@ -213,7 +209,6 @@ public class TerraSMP extends JavaPlugin implements Listener {
 
 		boardManager = new BoardManager(this, BoardSettings.builder().boardProvider(TerraSMPBoardProvider.getInstance()).scoreDirection(ScoreDirection.UP).build());
 
-		
 	}
 
 	@Override
