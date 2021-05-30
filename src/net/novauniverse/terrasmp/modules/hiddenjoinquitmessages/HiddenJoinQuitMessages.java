@@ -11,8 +11,10 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.permissions.PermissionDefault;
 
 import net.zeeraa.novacore.spigot.module.NovaModule;
+import net.zeeraa.novacore.spigot.module.annotations.NovaAutoLoad;
 import net.zeeraa.novacore.spigot.permission.PermissionRegistrator;
 
+@NovaAutoLoad(shouldEnable = true)
 public class HiddenJoinQuitMessages extends NovaModule implements Listener {
 	@Override
 	public String getName() {

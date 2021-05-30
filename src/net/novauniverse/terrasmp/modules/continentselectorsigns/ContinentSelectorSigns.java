@@ -18,7 +18,9 @@ import net.novauniverse.terrasmp.data.PlayerDataManager;
 import net.novauniverse.terrasmp.modules.labymod.TerraSMPLabymodIntegration;
 import net.zeeraa.novacore.commons.log.Log;
 import net.zeeraa.novacore.spigot.module.NovaModule;
+import net.zeeraa.novacore.spigot.module.annotations.NovaAutoLoad;
 
+@NovaAutoLoad(shouldEnable = true)
 public class ContinentSelectorSigns extends NovaModule implements Listener {
 	@Override
 	public String getName() {

@@ -9,7 +9,9 @@ import org.bukkit.event.player.PlayerInteractEvent;
 
 import net.zeeraa.novacore.spigot.NovaCore;
 import net.zeeraa.novacore.spigot.module.NovaModule;
+import net.zeeraa.novacore.spigot.module.annotations.NovaAutoLoad;
 
+@NovaAutoLoad(shouldEnable = true)
 public class DisableEyeOfEnder extends NovaModule implements Listener {
 	@Override
 	public String getName() {

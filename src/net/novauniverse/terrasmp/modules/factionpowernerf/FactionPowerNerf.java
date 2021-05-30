@@ -13,7 +13,9 @@ import com.massivecraft.factions.entity.MPlayer;
 import net.novauniverse.terrasmp.utils.FactionUtils;
 import net.zeeraa.novacore.commons.log.Log;
 import net.zeeraa.novacore.spigot.module.NovaModule;
+import net.zeeraa.novacore.spigot.module.annotations.NovaAutoLoad;
 
+@NovaAutoLoad(shouldEnable = true)
 public class FactionPowerNerf extends NovaModule implements Listener {
 	private static FactionPowerNerf instance;
 	private int playerLimit;

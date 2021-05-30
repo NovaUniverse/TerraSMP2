@@ -10,8 +10,10 @@ import org.bukkit.event.player.PlayerInteractEvent;
 
 import net.zeeraa.novacore.commons.log.Log;
 import net.zeeraa.novacore.spigot.module.NovaModule;
+import net.zeeraa.novacore.spigot.module.annotations.NovaAutoLoad;
 
-public class  NoCrystalPvP extends NovaModule implements Listener {
+@NovaAutoLoad(shouldEnable = true)
+public class NoCrystalPvP extends NovaModule implements Listener {
 	@Override
 	public String getName() {
 		return "NoCrystalPvP";
@@ -19,9 +21,9 @@ public class  NoCrystalPvP extends NovaModule implements Listener {
 
 	@EventHandler(priority = EventPriority.NORMAL)
 	public void onPlayerInteract(PlayerInteractEvent e) {
-		if(e.getAction() == Action.RIGHT_CLICK_AIR || e.getAction() == Action.RIGHT_CLICK_BLOCK) {
-			if(e.getPlayer().getInventory().getItemInMainHand().getType() == Material.END_CRYSTAL) {
-				if(e.getPlayer().getWorld().getEnvironment() == Environment.NORMAL) {
+		if (e.getAction() == Action.RIGHT_CLICK_AIR || e.getAction() == Action.RIGHT_CLICK_BLOCK) {
+			if (e.getPlayer().getInventory().getItemInMainHand().getType() == Material.END_CRYSTAL) {
+				if (e.getPlayer().getWorld().getEnvironment() == Environment.NORMAL) {
 					Log.trace("NoCrystalPvP", "Preventing player " + e.getPlayer() + " from placing an end crystal");
 					e.setCancelled(true);
 				}

@@ -8,17 +8,19 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 import net.novauniverse.terrasmp.data.PlayerDataManager;
 import net.zeeraa.novacore.spigot.module.NovaModule;
+import net.zeeraa.novacore.spigot.module.annotations.NovaAutoLoad;
 
+@NovaAutoLoad(shouldEnable = true)
 public class PlayerDataGarbageCollector extends NovaModule implements Listener {
-@Override
-public String getName() {
-	return "PlayerDataGarbageCollector";
-}
+	@Override
+	public String getName() {
+		return "PlayerDataGarbageCollector";
+	}
 
-@EventHandler(priority = EventPriority.MONITOR)
-public void onPlayerQuit(PlayerQuitEvent e) {
-	Player player = e.getPlayer();
+	@EventHandler(priority = EventPriority.MONITOR)
+	public void onPlayerQuit(PlayerQuitEvent e) {
+		Player player = e.getPlayer();
 
-	PlayerDataManager.unloadPlayerData(player.getUniqueId());
-}
+		PlayerDataManager.unloadPlayerData(player.getUniqueId());
+	}
 }

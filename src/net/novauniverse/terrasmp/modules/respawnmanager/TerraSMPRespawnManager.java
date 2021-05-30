@@ -15,7 +15,9 @@ import net.novauniverse.terrasmp.data.Continent;
 import net.novauniverse.terrasmp.data.ContinentIndex;
 import net.novauniverse.terrasmp.data.PlayerDataManager;
 import net.zeeraa.novacore.spigot.module.NovaModule;
+import net.zeeraa.novacore.spigot.module.annotations.NovaAutoLoad;
 
+@NovaAutoLoad(shouldEnable = true)
 public class TerraSMPRespawnManager extends NovaModule implements Listener {
 	@Override
 	public String getName() {
@@ -35,7 +37,7 @@ public class TerraSMPRespawnManager extends NovaModule implements Listener {
 			if (faction.getId().equalsIgnoreCase(FactionColl.get().getNone().getId()) || faction.getId().equalsIgnoreCase(FactionColl.get().getSafezone().getId()) || faction.getId().equalsIgnoreCase(FactionColl.get().getWarzone().getId())) {
 				randomRespawnLocation = true;
 			} else {
-				//System.out.println("faction.getHome() : " + faction.getHome());
+				// System.out.println("faction.getHome() : " + faction.getHome());
 				if (faction.getHome() == null) {
 					randomRespawnLocation = true;
 				}

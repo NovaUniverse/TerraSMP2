@@ -3,7 +3,7 @@ name: TerraSMP
 description: TerraSMP Plugin
 version: 1.0
 
-depend: [NovaCore, Factions, NovaMain, LabyApi, VillagerGUIApi]
+depend: [NovaCore, Factions, LabyApi, VillagerGUIApi]
 
 permissions:
    terrasmp.sign.selectcontinent:

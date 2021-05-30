@@ -21,7 +21,9 @@ import net.novauniverse.terrasmp.TerraSMP;
 import net.zeeraa.novacore.commons.log.Log;
 import net.zeeraa.novacore.commons.utils.JSONFileUtils;
 import net.zeeraa.novacore.spigot.module.NovaModule;
+import net.zeeraa.novacore.spigot.module.annotations.NovaAutoLoad;
 
+@NovaAutoLoad(shouldEnable = true)
 public class TerraSMPSystemMessage extends NovaModule implements Listener {
 	private static TerraSMPSystemMessage instance;
 
