@@ -4,7 +4,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.permissions.PermissionDefault;
 
-import net.novauniverse.terrasmp.TerraSMP;
+import net.novauniverse.terrasmp.modules.systemmessage.TerraSMPSystemMessage;
 import net.zeeraa.novacore.spigot.command.AllowedSenders;
 import net.zeeraa.novacore.spigot.command.NovaSubCommand;
 
@@ -25,7 +25,7 @@ public class SCReset extends NovaSubCommand {
 
 	@Override
 	public boolean execute(CommandSender sender, String commandLabel, String[] args) {
-		TerraSMP.getInstance().removeSystemMessage();
+		TerraSMPSystemMessage.getInstance().removeSystemMessage();
 		sender.sendMessage(ChatColor.GREEN + "System message removed");
 		return true;
 	}

@@ -25,16 +25,18 @@ import net.labymod.serverapi.common.widgets.components.widgets.ImageWidget;
 import net.labymod.serverapi.common.widgets.components.widgets.LabelWidget;
 import net.labymod.serverapi.common.widgets.util.Anchor;
 import net.labymod.serverapi.common.widgets.util.EnumScreenAction;
-import net.novauniverse.terrasmp.TerraSMP;
 import net.novauniverse.terrasmp.data.Continent;
+import net.novauniverse.terrasmp.data.ContinentIndex;
 import net.novauniverse.terrasmp.data.PlayerData;
 import net.novauniverse.terrasmp.data.PlayerDataManager;
 import net.novauniverse.terrasmp.utils.LabyModProtocol;
 import net.zeeraa.novacore.commons.log.Log;
 import net.zeeraa.novacore.commons.tasks.Task;
 import net.zeeraa.novacore.spigot.module.NovaModule;
+import net.zeeraa.novacore.spigot.module.annotations.NovaAutoLoad;
 import net.zeeraa.novacore.spigot.tasks.SimpleTask;
 
+@NovaAutoLoad(shouldEnable = true)
 public class TerraSMPLabymodIntegration extends NovaModule implements Listener {
 	private Task task;
 
@@ -127,16 +129,16 @@ public class TerraSMPLabymodIntegration extends NovaModule implements Listener {
 
 				int realId = widgetId - 100;
 
-				if (realId >= TerraSMP.getInstance().getContinents().size()) {
+				if (realId >= ContinentIndex.getContinents().size()) {
 					player.sendMessage(ChatColor.RED + "Failed to read continent id");
 					return;
 				}
 
-				Continent continent = TerraSMP.getInstance().getContinents().get(realId);
+				Continent continent = ContinentIndex.getContinents().get(realId);
 
 				player.sendMessage(ChatColor.GOLD + "Selected " + ChatColor.AQUA + continent.getDisplayName() + ChatColor.GOLD + " as your starter continent");
 
-				TerraSMP.setStarterContinent(player, continent);
+				ContinentIndex.setStarterContinent(player, continent);
 			}
 		}
 	}
@@ -239,13 +241,13 @@ public class TerraSMPLabymodIntegration extends NovaModule implements Listener {
 		boolean alternating = false;
 		int lastY = 0;
 
-		for (int i = 0; i < TerraSMP.getInstance().getContinents().size(); i++) {
+		for (int i = 0; i < ContinentIndex.getContinents().size(); i++) {
 			int x = alternating ? -110 : 10;
 			lastY = (int) (25 * Math.floor(i / 2));
 
 			alternating = !alternating;
 
-			String text = TerraSMP.getInstance().getContinents().get(i).getDisplayName();
+			String text = ContinentIndex.getContinents().get(i).getDisplayName();
 
 			ButtonWidget button = new ButtonWidget(i + 100, anchor, x, lastY, text, 100, 20);
 			button.setCloseScreenOnClick(true);

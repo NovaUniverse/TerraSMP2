@@ -14,8 +14,10 @@ import net.zeeraa.novacore.commons.utils.DateTimeParser;
 import net.zeeraa.novacore.commons.utils.DateTimeUtils;
 import net.zeeraa.novacore.commons.utils.JSONFileUtils;
 import net.zeeraa.novacore.spigot.module.NovaModule;
+import net.zeeraa.novacore.spigot.module.annotations.NovaAutoLoad;
 import net.zeeraa.novacore.spigot.tasks.SimpleTask;
 
+@NovaAutoLoad(shouldEnable = true)
 public class TerraSMPTime extends NovaModule {
 	private static TerraSMPTime instance;
 	private ZoneId zoneId;

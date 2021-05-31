@@ -296,7 +296,7 @@ public class TerraSMP extends JavaPlugin implements Listener {
 
 		try {
 			int port = getConfig().getInt("web-server-port");
-			Log.info("TerraSMP", ChatColor.GREEN + "Starting web server on port " + port);
+			Log.info("TerraSMP",ChatColor.GREEN + "Starting web server on port " + port);
 			webServer = new WebServer(port);
 		} catch (Exception e) {
 			e.printStackTrace();

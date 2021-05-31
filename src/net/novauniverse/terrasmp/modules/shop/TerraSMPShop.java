@@ -10,8 +10,10 @@ import org.bukkit.inventory.ItemStack;
 import masecla.villager.classes.VillagerInventory;
 import masecla.villager.classes.VillagerTrade;
 import net.zeeraa.novacore.spigot.module.NovaModule;
+import net.zeeraa.novacore.spigot.module.annotations.NovaAutoLoad;
 import net.zeeraa.novacore.spigot.utils.ItemBuilder;
 
+@NovaAutoLoad(shouldEnable = true)
 public class TerraSMPShop extends NovaModule {
 	private static TerraSMPShop instance;
 
