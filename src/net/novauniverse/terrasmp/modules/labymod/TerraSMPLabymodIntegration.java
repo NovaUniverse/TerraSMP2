@@ -25,7 +25,6 @@ import net.labymod.serverapi.common.widgets.components.widgets.ImageWidget;
 import net.labymod.serverapi.common.widgets.components.widgets.LabelWidget;
 import net.labymod.serverapi.common.widgets.util.Anchor;
 import net.labymod.serverapi.common.widgets.util.EnumScreenAction;
-import net.novauniverse.terrasmp.TerraSMP;
 import net.novauniverse.terrasmp.data.Continent;
 import net.novauniverse.terrasmp.data.ContinentIndex;
 import net.novauniverse.terrasmp.data.PlayerData;
@@ -139,7 +138,7 @@ public class TerraSMPLabymodIntegration extends NovaModule implements Listener {
 
 				player.sendMessage(ChatColor.GOLD + "Selected " + ChatColor.AQUA + continent.getDisplayName() + ChatColor.GOLD + " as your starter continent");
 
-				TerraSMP.setStarterContinent(player, continent);
+				ContinentIndex.setStarterContinent(player, continent);
 			}
 		}
 	}

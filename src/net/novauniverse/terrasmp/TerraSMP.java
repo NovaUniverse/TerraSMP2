@@ -3,7 +3,6 @@ package net.novauniverse.terrasmp;
 import java.io.File;
 import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
@@ -22,11 +21,9 @@ import net.novauniverse.terrasmp.commands.shop.ShopCommand;
 import net.novauniverse.terrasmp.commands.systemmessage.SystemMessageCommand;
 import net.novauniverse.terrasmp.commands.terrasmp.TerraSMPCommand;
 import net.novauniverse.terrasmp.commands.wipeplayerdata.WipePlayerDataCommand;
-import net.novauniverse.terrasmp.data.Continent;
 import net.novauniverse.terrasmp.data.ContinentIndex;
 import net.novauniverse.terrasmp.data.PlayerDataManager;
 import net.novauniverse.terrasmp.modules.factionpowernerf.FactionPowerNerf;
-import net.novauniverse.terrasmp.modules.hiddenplayers.HiddenPlayers;
 import net.novauniverse.terrasmp.pluginmessagelisteners.WDLBlocker;
 import net.novauniverse.terrasmp.scoreboard.TerraSMPBoardProvider;
 import net.zeeraa.novacore.commons.log.Log;
@@ -138,7 +135,6 @@ public class TerraSMP extends JavaPlugin implements Listener {
 		Log.info("TerraSMP", "Faction power nerf limit: " + FactionPowerNerf.getInstance().getPlayerLimit());
 
 		boardManager = new BoardManager(this, BoardSettings.builder().boardProvider(TerraSMPBoardProvider.getInstance()).scoreDirection(ScoreDirection.UP).build());
-
 	}
 
 	@Override
@@ -147,22 +143,5 @@ public class TerraSMP extends JavaPlugin implements Listener {
 		Bukkit.getScheduler().cancelTasks(this);
 
 		PlayerDataManager.unloadAll();
-	}
-
-	public static void setStarterContinent(Player player, Continent continent) {
-		PlayerDataManager.getPlayerData(player.getUniqueId()).setStarterContinent(continent.getName());
-		PlayerDataManager.savePlayerData(player.getUniqueId());
-
-		HiddenPlayers.getInstance().showPlayer(player);
-
-		Location location = continent.getRandomSpawnLocation();
-
-		if (location != null) {
-			player.teleport(location.add(0, 2, 0));
-			return;
-		}
-
-		player.sendMessage(ChatColor.RED + "Failed to find a spawn location. Please try again");
-		Log.warn("TerraSMP", "Failed to get spawn location for player " + player.getName() + " in continent " + continent.getName());
 	}
 }
