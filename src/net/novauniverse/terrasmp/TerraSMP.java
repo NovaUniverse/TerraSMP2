@@ -40,6 +40,7 @@ import com.massivecraft.factions.entity.MPlayer;
 import me.missionary.board.BoardManager;
 import me.missionary.board.settings.BoardSettings;
 import me.missionary.board.settings.ScoreDirection;
+import net.novauniverse.terrasmp.api.WebServer;
 import net.novauniverse.terrasmp.commands.invitetofaction.InviteToFactionCommand;
 import net.novauniverse.terrasmp.commands.map.MapCommand;
 import net.novauniverse.terrasmp.commands.removebed.RemoveBedCommand;
@@ -80,6 +81,8 @@ public class TerraSMP extends JavaPlugin implements Listener {
 
 	private String systemMessage;
 	private BossBar systemMessageBar;
+
+	private WebServer webServer;
 
 	private Location spawnLocation;
 
@@ -290,6 +293,14 @@ public class TerraSMP extends JavaPlugin implements Listener {
 		} catch (JSONException | IOException e) {
 			e.printStackTrace();
 		}
+
+		try {
+			int port = getConfig().getInt("web-server-port");
+			Log.info("TerraSMP", ChatColor.GREEN + "Starting web server on port " + port);
+			webServer = new WebServer(port);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
@@ -298,6 +309,8 @@ public class TerraSMP extends JavaPlugin implements Listener {
 		Bukkit.getScheduler().cancelTasks(this);
 
 		PlayerDataManager.unloadAll();
+
+		webServer.stop();
 	}
 
 	@EventHandler(priority = EventPriority.HIGH)
@@ -370,7 +383,7 @@ public class TerraSMP extends JavaPlugin implements Listener {
 			if (faction.getId().equalsIgnoreCase(FactionColl.get().getNone().getId()) || faction.getId().equalsIgnoreCase(FactionColl.get().getSafezone().getId()) || faction.getId().equalsIgnoreCase(FactionColl.get().getWarzone().getId())) {
 				randomRespawnLocation = true;
 			} else {
-				//System.out.println("faction.getHome() : " + faction.getHome());
+				// System.out.println("faction.getHome() : " + faction.getHome());
 				if (faction.getHome() == null) {
 					randomRespawnLocation = true;
 				}
