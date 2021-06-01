@@ -31,6 +31,7 @@ import net.novauniverse.terrasmp.data.Continent;
 import net.novauniverse.terrasmp.data.ContinentIndex;
 import net.novauniverse.terrasmp.data.PlayerData;
 import net.novauniverse.terrasmp.data.PlayerDataManager;
+import net.novauniverse.terrasmp.modules.extendeddebugging.TerraSMPExtendedDebugging;
 import net.novauniverse.terrasmp.utils.LabyModProtocol;
 import net.zeeraa.novacore.commons.log.Log;
 import net.zeeraa.novacore.commons.tasks.Task;
@@ -50,7 +51,7 @@ public class TerraSMPLabymodIntegration extends NovaModule implements Listener {
 
 	private Map<UUID, Integer> deathsCache;
 	private Map<UUID, Integer> killsCache;
-	private Map<UUID, Map<UUID, String>> playerTitleCache;
+	//private Map<UUID, Map<UUID, String>> playerTitleCache;
 
 	public static TerraSMPLabymodIntegration getInstance() {
 		return instance;
@@ -67,7 +68,7 @@ public class TerraSMPLabymodIntegration extends NovaModule implements Listener {
 
 		this.deathsCache = new HashMap<>();
 		this.killsCache = new HashMap<>();
-		this.playerTitleCache = new HashMap<>();
+		//this.playerTitleCache = new HashMap<>();
 
 		this.task = new SimpleTask(new Runnable() {
 			@Override
@@ -84,7 +85,7 @@ public class TerraSMPLabymodIntegration extends NovaModule implements Listener {
 	public void onEnable() throws Exception {
 		deathsCache.clear();
 		killsCache.clear();
-		playerTitleCache.clear();
+		//playerTitleCache.clear();
 		Task.tryStartTask(task);
 	}
 
@@ -93,7 +94,7 @@ public class TerraSMPLabymodIntegration extends NovaModule implements Listener {
 		Task.tryStopTask(task);
 		deathsCache.clear();
 		killsCache.clear();
-		playerTitleCache.clear();
+		//playerTitleCache.clear();
 	}
 
 	@EventHandler(priority = EventPriority.NORMAL)
@@ -110,14 +111,16 @@ public class TerraSMPLabymodIntegration extends NovaModule implements Listener {
 	public void onPlayerQuit(PlayerQuitEvent e) {
 		deathsCache.remove(e.getPlayer().getUniqueId());
 		killsCache.remove(e.getPlayer().getUniqueId());
-		playerTitleCache.remove(e.getPlayer().getUniqueId());
+		//playerTitleCache.remove(e.getPlayer().getUniqueId());
 
 		this.sendCurrentPlayingGamemode(e.getPlayer(), false, "TerraSMP");
 	}
 
 	@EventHandler(priority = EventPriority.NORMAL)
 	public void onBukkitMessageReceiveEvent(BukkitMessageReceiveEvent e) {
-		Log.trace(this.getName(), e.getClass().getName() + ": " + e.getPlayer().getName() + " | " + e.getMessageKey() + " | " + e.getMessageContent().toString());
+		if (TerraSMPExtendedDebugging.getInstance().isEnabled()) {
+			Log.debug(this.getName(), e.getClass().getName() + ": " + e.getPlayer().getName() + " | " + e.getMessageKey() + " | " + e.getMessageContent().toString());
+		}
 		try {
 			if (e.getMessageKey().equalsIgnoreCase("screen")) {
 				JSONObject json = new JSONObject(e.getMessageContent().toString());
@@ -336,22 +339,23 @@ public class TerraSMPLabymodIntegration extends NovaModule implements Listener {
 	}
 
 	public void setSubtitle(Player receiver, UUID subtitlePlayer, String value) {
-		if (!playerTitleCache.containsKey(receiver.getUniqueId())) {
-			playerTitleCache.put(subtitlePlayer, new HashMap<>());
+		//if (!playerTitleCache.containsKey(receiver.getUniqueId())) {
+		//	playerTitleCache.put(subtitlePlayer, new HashMap<>());
+		//}
+
+		//Map<UUID, String> cache = playerTitleCache.get(receiver.getUniqueId());
+
+		//if (cache.containsKey(subtitlePlayer)) {
+		//	if (cache.get(subtitlePlayer).equalsIgnoreCase(value)) {
+		//		return;
+		//	}
+		//}
+
+		//cache.put(subtitlePlayer, value);
+
+		if (TerraSMPExtendedDebugging.getInstance().isEnabled()) {
+			Log.debug(getName(), "Sending title to " + receiver.getName() + " for player " + subtitlePlayer.toString() + " with value " + value);
 		}
-
-		Map<UUID, String> cache = playerTitleCache.get(receiver.getUniqueId());
-
-		if (cache.containsKey(subtitlePlayer)) {
-			if (cache.get(subtitlePlayer).equalsIgnoreCase(value)) {
-				return;
-			}
-		}
-
-		cache.put(subtitlePlayer, value);
-
-		// Log.trace("Sending title to " + receiver.getName() + " for player " +
-		// subtitlePlayer.toString() + " with value " + value);
 
 		// List of all subtitles
 		JsonArray array = new JsonArray();
