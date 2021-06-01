@@ -1,5 +1,7 @@
 package net.novauniverse.terrasmp.modules.labymod;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -46,6 +48,10 @@ public class TerraSMPLabymodIntegration extends NovaModule implements Listener {
 	public static final String DEATHS_ICON = "https://novauniverse.net/cdn/terrasmp/icon_deaths.png";
 	public static final String SERVER_BANNER = "https://novauniverse.net/cdn/terrasmp/labymod_ingame_banner.png";
 
+	private Map<UUID, Integer> deathsCache;
+	private Map<UUID, Integer> killsCache;
+	private Map<UUID, Map<UUID, String>> playerTitleCache;
+
 	public static TerraSMPLabymodIntegration getInstance() {
 		return instance;
 	}
@@ -58,6 +64,10 @@ public class TerraSMPLabymodIntegration extends NovaModule implements Listener {
 	@Override
 	public void onLoad() {
 		TerraSMPLabymodIntegration.instance = this;
+
+		this.deathsCache = new HashMap<>();
+		this.killsCache = new HashMap<>();
+		this.playerTitleCache = new HashMap<>();
 
 		this.task = new SimpleTask(new Runnable() {
 			@Override
@@ -72,12 +82,18 @@ public class TerraSMPLabymodIntegration extends NovaModule implements Listener {
 
 	@Override
 	public void onEnable() throws Exception {
+		deathsCache.clear();
+		killsCache.clear();
+		playerTitleCache.clear();
 		Task.tryStartTask(task);
 	}
 
 	@Override
 	public void onDisable() throws Exception {
 		Task.tryStopTask(task);
+		deathsCache.clear();
+		killsCache.clear();
+		playerTitleCache.clear();
 	}
 
 	@EventHandler(priority = EventPriority.NORMAL)
@@ -92,6 +108,10 @@ public class TerraSMPLabymodIntegration extends NovaModule implements Listener {
 
 	@EventHandler(priority = EventPriority.NORMAL)
 	public void onPlayerQuit(PlayerQuitEvent e) {
+		deathsCache.remove(e.getPlayer().getUniqueId());
+		killsCache.remove(e.getPlayer().getUniqueId());
+		playerTitleCache.remove(e.getPlayer().getUniqueId());
+
 		this.sendCurrentPlayingGamemode(e.getPlayer(), false, "TerraSMP");
 	}
 
@@ -193,8 +213,30 @@ public class TerraSMPLabymodIntegration extends NovaModule implements Listener {
 		int kills = data.getKills();
 		int deaths = data.getDeaths();
 
-		updateBalanceDisplay(player, EnumBalanceType.CASH, true, kills, KILLS_ICON);
-		updateBalanceDisplay(player, EnumBalanceType.BANK, true, deaths, DEATHS_ICON);
+		boolean updateKills = true;
+		boolean updateDeaths = true;
+
+		if (killsCache.containsKey(player.getUniqueId())) {
+			if (killsCache.get(player.getUniqueId()) == kills) {
+				updateKills = false;
+			}
+		}
+
+		if (deathsCache.containsKey(player.getUniqueId())) {
+			if (deathsCache.get(player.getUniqueId()) == deaths) {
+				updateDeaths = false;
+			}
+		}
+
+		if (updateKills) {
+			updateBalanceDisplay(player, EnumBalanceType.CASH, true, kills, KILLS_ICON);
+			killsCache.put(player.getUniqueId(), kills);
+		}
+
+		if (updateDeaths) {
+			updateBalanceDisplay(player, EnumBalanceType.BANK, true, deaths, DEATHS_ICON);
+			deathsCache.put(player.getUniqueId(), deaths);
+		}
 	}
 
 	public void updateBalanceDisplay(Player player, EnumBalanceType type, boolean visible, int balance, String icon) {
@@ -294,6 +336,23 @@ public class TerraSMPLabymodIntegration extends NovaModule implements Listener {
 	}
 
 	public void setSubtitle(Player receiver, UUID subtitlePlayer, String value) {
+		if (!playerTitleCache.containsKey(receiver.getUniqueId())) {
+			playerTitleCache.put(subtitlePlayer, new HashMap<>());
+		}
+
+		Map<UUID, String> cache = playerTitleCache.get(receiver.getUniqueId());
+
+		if (cache.containsKey(subtitlePlayer)) {
+			if (cache.get(subtitlePlayer).equalsIgnoreCase(value)) {
+				return;
+			}
+		}
+
+		cache.put(subtitlePlayer, value);
+
+		// Log.trace("Sending title to " + receiver.getName() + " for player " +
+		// subtitlePlayer.toString() + " with value " + value);
+
 		// List of all subtitles
 		JsonArray array = new JsonArray();
 

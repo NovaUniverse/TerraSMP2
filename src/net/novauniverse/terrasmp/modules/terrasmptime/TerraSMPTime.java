@@ -72,7 +72,7 @@ public class TerraSMPTime extends NovaModule {
 
 				scoreboardDate = scoreboardDateTimeParser.dateToString(terraSMPCurrentDate);
 
-				Log.trace(getName(), "Now at " + DateTimeUtils.getDefaultDateTimeParser().dateToString(terraSMPCurrentDate));
+				//Log.trace(getName(), "Now at " + DateTimeUtils.getDefaultDateTimeParser().dateToString(terraSMPCurrentDate));
 			}
 		}, 20L);
 	}

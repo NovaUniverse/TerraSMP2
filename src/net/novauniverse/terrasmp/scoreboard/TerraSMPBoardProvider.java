@@ -37,6 +37,8 @@ public class TerraSMPBoardProvider extends NovaModule implements BoardProvider, 
 	private Task task;
 	private String tspString;
 
+	private List<ScoreboardModifier> modifiers;
+
 	public static TerraSMPBoardProvider getInstance() {
 		return instance;
 	}
@@ -49,6 +51,7 @@ public class TerraSMPBoardProvider extends NovaModule implements BoardProvider, 
 	@Override
 	public void onLoad() {
 		TerraSMPBoardProvider.instance = this;
+		modifiers = new ArrayList<>();
 		boardDataMap = new HashMap<>();
 		tspString = ChatColor.DARK_GRAY + "Unknown";
 		task = new SimpleTask(new Runnable() {
@@ -81,7 +84,7 @@ public class TerraSMPBoardProvider extends NovaModule implements BoardProvider, 
 
 	@Override
 	public List<String> getLines(Player player) {
-		//Log.trace("getLines(" + player + ")");
+		// Log.trace("getLines(" + player + ")");
 
 		List<String> lines = new ArrayList<>();
 
@@ -99,10 +102,13 @@ public class TerraSMPBoardProvider extends NovaModule implements BoardProvider, 
 			lines.add("");
 			lines.add(tspString);
 			lines.add(data.getPing());
-
 		}
 
 		lines.add(ChatColor.YELLOW + "novauniverse.net");
+
+		for (ScoreboardModifier modifier : modifiers) {
+			modifier.process(lines, player);
+		}
 
 		return lines;
 	}
@@ -110,6 +116,14 @@ public class TerraSMPBoardProvider extends NovaModule implements BoardProvider, 
 	@Override
 	public String getTitle(Player player) {
 		return ChatColor.AQUA + "" + ChatColor.BOLD + "TerraSMP";
+	}
+
+	public List<ScoreboardModifier> getModifiers() {
+		return modifiers;
+	}
+	
+	public void addModifier(ScoreboardModifier modifier) {
+		modifiers.add(modifier);
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST)
@@ -199,7 +213,7 @@ public class TerraSMPBoardProvider extends NovaModule implements BoardProvider, 
 		boardData.setInFaction(in);
 		boardData.setFactionPower(factionPower);
 		boardData.setPower(playerPower);
-		
+
 		int ping = NovaCore.getInstance().getVersionIndependentUtils().getPlayerPing(player);
 		boardData.setPing(ChatColor.GOLD + "Ping: " + TextUtils.formatPing(ping));
 	}

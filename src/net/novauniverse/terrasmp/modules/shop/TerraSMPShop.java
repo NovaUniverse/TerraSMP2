@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -42,6 +43,7 @@ public class TerraSMPShop extends NovaModule {
 		trades.add(new VillagerTrade(emeralds(5), new ItemBuilder(Material.GHAST_TEAR).setAmount(1).build(), MAX_TRADE_USES));
 		trades.add(new VillagerTrade(emeralds(5), new ItemBuilder(Material.MAGMA_CREAM).setAmount(1).build(), MAX_TRADE_USES));
 		trades.add(new VillagerTrade(emeralds(1), new ItemBuilder(Material.SULPHUR).setAmount(5).build(), MAX_TRADE_USES));
+		trades.add(new VillagerTrade(emeralds(32), new ItemBuilder(Material.ENCHANTED_BOOK).addStoredEnchant(Enchantment.MENDING, 1, true).build(), MAX_TRADE_USES));
 	}
 
 	@Override
