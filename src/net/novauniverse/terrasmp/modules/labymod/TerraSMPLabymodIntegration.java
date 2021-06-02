@@ -339,19 +339,6 @@ public class TerraSMPLabymodIntegration extends NovaModule implements Listener {
 	}
 
 	public void setSubtitle(Player receiver, UUID subtitlePlayer, String value) {
-		//if (!playerTitleCache.containsKey(receiver.getUniqueId())) {
-		//	playerTitleCache.put(subtitlePlayer, new HashMap<>());
-		//}
-
-		//Map<UUID, String> cache = playerTitleCache.get(receiver.getUniqueId());
-
-		//if (cache.containsKey(subtitlePlayer)) {
-		//	if (cache.get(subtitlePlayer).equalsIgnoreCase(value)) {
-		//		return;
-		//	}
-		//}
-
-		//cache.put(subtitlePlayer, value);
 
 		if (TerraSMPExtendedDebugging.getInstance().isEnabled()) {
 			Log.debug(getName(), "Sending title to " + receiver.getName() + " for player " + subtitlePlayer.toString() + " with value " + value);

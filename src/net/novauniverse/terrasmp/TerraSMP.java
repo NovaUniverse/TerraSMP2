@@ -51,17 +51,9 @@ import net.novauniverse.terrasmp.data.Continent;
 import net.novauniverse.terrasmp.data.ContinentIndex;
 import net.novauniverse.terrasmp.data.PlayerData;
 import net.novauniverse.terrasmp.data.PlayerDataManager;
-import net.novauniverse.terrasmp.modules.continentselectorsigns.ContinentSelectorSigns;
-import net.novauniverse.terrasmp.modules.disableeyeofender.DisableEyeOfEnder;
-import net.novauniverse.terrasmp.modules.dropplayerheads.DropPlayerHeadsOnKill;
-import net.novauniverse.terrasmp.modules.extendeddebugging.TerraSMPExtendedDebugging;
 import net.novauniverse.terrasmp.modules.factionpowernerf.FactionPowerNerf;
 import net.novauniverse.terrasmp.modules.hiddenplayers.HiddenPlayers;
-import net.novauniverse.terrasmp.modules.kdr.KDRManager;
 import net.novauniverse.terrasmp.modules.labymod.TerraSMPLabymodIntegration;
-import net.novauniverse.terrasmp.modules.nocrystalpvp.NoCrystalPvP;
-import net.novauniverse.terrasmp.modules.shop.TerraSMPShop;
-import net.novauniverse.terrasmp.modules.terrasmptime.TerraSMPTime;
 import net.novauniverse.terrasmp.pluginmessagelisteners.WDLBlocker;
 import net.novauniverse.terrasmp.scoreboard.TerraSMPBoardProvider;
 import net.novauniverse.terrasmp.utils.PlayerMessages;
@@ -223,20 +215,22 @@ public class TerraSMP extends JavaPlugin implements Listener {
 			PlayerDataManager.getPlayerData(player.getUniqueId());
 		}
 		
-		ModuleManager.loadModule(TerraSMPExtendedDebugging.class);
+		//ModuleManager.loadModule(TerraSMPExtendedDebugging.class);
 
-		ModuleManager.loadModule(HiddenPlayers.class, true);
-		ModuleManager.loadModule(DisableEyeOfEnder.class, true);
-		ModuleManager.loadModule(DropPlayerHeadsOnKill.class, true);
-		ModuleManager.loadModule(FactionPowerNerf.class, true);
-		ModuleManager.loadModule(NoCrystalPvP.class, true);
-		ModuleManager.loadModule(TerraSMPLabymodIntegration.class, true);
-		ModuleManager.loadModule(ContinentSelectorSigns.class, true);
-		ModuleManager.loadModule(TerraSMPBoardProvider.class, true);
-		ModuleManager.loadModule(KDRManager.class, true);
-		ModuleManager.loadModule(TerraSMPShop.class, true);
-		ModuleManager.loadModule(TerraSMPTime.class, true);
+		//ModuleManager.loadModule(HiddenPlayers.class, true);
+		//ModuleManager.loadModule(DisableEyeOfEnder.class, true);
+		//ModuleManager.loadModule(DropPlayerHeadsOnKill.class, true);
+		//ModuleManager.loadModule(FactionPowerNerf.class, true);
+		//ModuleManager.loadModule(NoCrystalPvP.class, true);
+		//ModuleManager.loadModule(TerraSMPLabymodIntegration.class, true);
+		//ModuleManager.loadModule(ContinentSelectorSigns.class, true);
+		//ModuleManager.loadModule(TerraSMPBoardProvider.class, true);
+		//ModuleManager.loadModule(KDRManager.class, true);
+		//ModuleManager.loadModule(TerraSMPShop.class, true);
+		//ModuleManager.loadModule(TerraSMPTime.class, true);
 
+		ModuleManager.scanForModules(this, "net.novauniverse.terrasmp.modules");
+		
 		CommandRegistry.registerCommand(new SystemMessageCommand());
 		CommandRegistry.registerCommand(new RemoveBedCommand());
 		CommandRegistry.registerCommand(new MapCommand());
