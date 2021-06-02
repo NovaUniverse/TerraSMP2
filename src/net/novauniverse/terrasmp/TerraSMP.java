@@ -229,7 +229,7 @@ public class TerraSMP extends JavaPlugin implements Listener {
 		//ModuleManager.loadModule(TerraSMPShop.class, true);
 		//ModuleManager.loadModule(TerraSMPTime.class, true);
 
-		ModuleManager.scanForModules(this, "net.novauniverse.terrasmp.modules");
+		ModuleManager.scanForModules(this, "net.novauniverse.terrasmp");
 		
 		CommandRegistry.registerCommand(new SystemMessageCommand());
 		CommandRegistry.registerCommand(new RemoveBedCommand());

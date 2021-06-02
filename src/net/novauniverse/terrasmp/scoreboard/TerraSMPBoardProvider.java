@@ -29,8 +29,10 @@ import net.zeeraa.novacore.commons.tasks.Task;
 import net.zeeraa.novacore.commons.utils.TextUtils;
 import net.zeeraa.novacore.spigot.NovaCore;
 import net.zeeraa.novacore.spigot.module.NovaModule;
+import net.zeeraa.novacore.spigot.module.annotations.NovaAutoLoad;
 import net.zeeraa.novacore.spigot.tasks.SimpleTask;
 
+@NovaAutoLoad(shouldEnable = true)
 public class TerraSMPBoardProvider extends NovaModule implements BoardProvider, Listener {
 	private static TerraSMPBoardProvider instance;
 	private HashMap<UUID, BoardData> boardDataMap;
