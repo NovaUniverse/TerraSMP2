@@ -9,6 +9,7 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 
 import com.massivecraft.factions.entity.MPlayer;
 
+import net.zeeraa.novacore.commons.utils.NumberUtils;
 import net.zeeraa.novacore.spigot.module.NovaModule;
 import net.zeeraa.novacore.spigot.module.annotations.NovaAutoLoad;
 
@@ -36,11 +37,16 @@ public class PowerOnKillModule extends NovaModule implements Listener {
 					gain = mKiller.getPowerMax() - mKiller.getPower();
 				}
 
+				if (gain < 1) {
+					// dont bother to give the player power if its a smaller amount than 1
+					return;
+				}
+
 				double newPower = mKiller.getPower() + gain;
 
 				mKiller.setPower(newPower);
 
-				killer.sendMessage(ChatColor.GREEN + "Gained " + ChatColor.AQUA + "+" + gain + ChatColor.GOLD + " power for killing " + ChatColor.AQUA + player.getDisplayName());
+				killer.sendMessage(ChatColor.GREEN + "Gained " + ChatColor.AQUA + "+" + NumberUtils.round(gain, 1) + ChatColor.GOLD + " power for killing " + ChatColor.AQUA + player.getDisplayName());
 			}
 		}
 	}
