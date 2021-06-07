@@ -24,7 +24,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -32,8 +31,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.massivecraft.factions.entity.Faction;
-import com.massivecraft.factions.entity.FactionColl;
 import com.massivecraft.factions.entity.MPlayer;
 
 import me.missionary.board.BoardManager;
@@ -66,14 +63,14 @@ import net.zeeraa.novacore.spigot.permission.PermissionRegistrator;
 
 public class TerraSMP extends JavaPlugin implements Listener {
 	private static TerraSMP instance;
-	
+
 	private File playerDataFolder;
 	private File systemMessageFile;
 
 	private String systemMessage;
 	private BossBar systemMessageBar;
 
-	private WebServer webServer;
+	private WebServer webServer = null;
 
 	private Location spawnLocation;
 
@@ -196,10 +193,11 @@ public class TerraSMP extends JavaPlugin implements Listener {
 		File continentFile = new File(getDataFolder().getPath() + File.separator + "continents.json");
 		if (continentFile.exists()) {
 			try {
-				
-				//continents = ContinentReader.readContinents(continentFile, Bukkit.getServer().getWorlds().get(0));
+
+				// continents = ContinentReader.readContinents(continentFile,
+				// Bukkit.getServer().getWorlds().get(0));
 				ContinentIndex.loadContinents(continentFile, Bukkit.getServer().getWorlds().get(0));
-				
+
 				Log.info("TerraSMP", ContinentIndex.getContinents().size() + " continents loaded");
 			} catch (Exception e) {
 				Log.fatal("Failed to read continent file " + continentFile.getPath() + ". Caused by " + e.getClass().getName());
@@ -214,23 +212,23 @@ public class TerraSMP extends JavaPlugin implements Listener {
 		for (Player player : Bukkit.getServer().getOnlinePlayers()) {
 			PlayerDataManager.getPlayerData(player.getUniqueId());
 		}
-		
-		//ModuleManager.loadModule(TerraSMPExtendedDebugging.class);
 
-		//ModuleManager.loadModule(HiddenPlayers.class, true);
-		//ModuleManager.loadModule(DisableEyeOfEnder.class, true);
-		//ModuleManager.loadModule(DropPlayerHeadsOnKill.class, true);
-		//ModuleManager.loadModule(FactionPowerNerf.class, true);
-		//ModuleManager.loadModule(NoCrystalPvP.class, true);
-		//ModuleManager.loadModule(TerraSMPLabymodIntegration.class, true);
-		//ModuleManager.loadModule(ContinentSelectorSigns.class, true);
-		//ModuleManager.loadModule(TerraSMPBoardProvider.class, true);
-		//ModuleManager.loadModule(KDRManager.class, true);
-		//ModuleManager.loadModule(TerraSMPShop.class, true);
-		//ModuleManager.loadModule(TerraSMPTime.class, true);
+		// ModuleManager.loadModule(TerraSMPExtendedDebugging.class);
+
+		// ModuleManager.loadModule(HiddenPlayers.class, true);
+		// ModuleManager.loadModule(DisableEyeOfEnder.class, true);
+		// ModuleManager.loadModule(DropPlayerHeadsOnKill.class, true);
+		// ModuleManager.loadModule(FactionPowerNerf.class, true);
+		// ModuleManager.loadModule(NoCrystalPvP.class, true);
+		// ModuleManager.loadModule(TerraSMPLabymodIntegration.class, true);
+		// ModuleManager.loadModule(ContinentSelectorSigns.class, true);
+		// ModuleManager.loadModule(TerraSMPBoardProvider.class, true);
+		// ModuleManager.loadModule(KDRManager.class, true);
+		// ModuleManager.loadModule(TerraSMPShop.class, true);
+		// ModuleManager.loadModule(TerraSMPTime.class, true);
 
 		ModuleManager.scanForModules(this, "net.novauniverse.terrasmp");
-		
+
 		CommandRegistry.registerCommand(new SystemMessageCommand());
 		CommandRegistry.registerCommand(new RemoveBedCommand());
 		CommandRegistry.registerCommand(new MapCommand());
@@ -291,12 +289,14 @@ public class TerraSMP extends JavaPlugin implements Listener {
 			e.printStackTrace();
 		}
 
+		int apiPort = getConfig().getInt("web-server-port");
 		try {
-			int port = getConfig().getInt("web-server-port");
-			Log.info("TerraSMP",ChatColor.GREEN + "Starting web server on port " + port);
-			webServer = new WebServer(port);
+
+			Log.info("TerraSMP", ChatColor.GREEN + "Starting web server on port " + apiPort);
+			webServer = new WebServer(apiPort);
 		} catch (Exception e) {
 			e.printStackTrace();
+			Log.error("TerraSMP", "Failed to start api on port " + apiPort);
 		}
 	}
 
@@ -307,7 +307,9 @@ public class TerraSMP extends JavaPlugin implements Listener {
 
 		PlayerDataManager.unloadAll();
 
-		webServer.stop();
+		if (webServer != null) {
+			webServer.stop();
+		}
 	}
 
 	@EventHandler(priority = EventPriority.HIGH)
@@ -365,36 +367,6 @@ public class TerraSMP extends JavaPlugin implements Listener {
 	public void onPlayerDeath(PlayerDeathEvent e) {
 		String newMessage = ChatColor.DARK_GRAY + "[" + ChatColor.RED + ChatColor.BOLD + "*" + ChatColor.RESET + ChatColor.DARK_GRAY + "] " + ChatColor.RED + e.getDeathMessage();
 		e.setDeathMessage(newMessage);
-	}
-
-	@EventHandler
-	public void onPlayerRespawn(PlayerRespawnEvent e) {
-		Player player = e.getPlayer();
-		if (!e.isBedSpawn()) {
-			MPlayer mPlayer = MPlayer.get(player);
-
-			Faction faction = mPlayer.getFaction();
-
-			boolean randomRespawnLocation = false;
-
-			if (faction.getId().equalsIgnoreCase(FactionColl.get().getNone().getId()) || faction.getId().equalsIgnoreCase(FactionColl.get().getSafezone().getId()) || faction.getId().equalsIgnoreCase(FactionColl.get().getWarzone().getId())) {
-				randomRespawnLocation = true;
-			} else {
-				// System.out.println("faction.getHome() : " + faction.getHome());
-				if (faction.getHome() == null) {
-					randomRespawnLocation = true;
-				}
-			}
-
-			if (randomRespawnLocation) {
-				Continent continent = getContinent(PlayerDataManager.getPlayerData(player.getUniqueId()).getStarterContinent());
-
-				if (continent != null) {
-					Location location = continent.getRandomSpawnLocation();
-					e.setRespawnLocation(location.add(0, 2, 0));
-				}
-			}
-		}
 	}
 
 	public static void setStarterContinent(Player player, Continent continent) {
