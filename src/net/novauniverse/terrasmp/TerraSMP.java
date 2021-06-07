@@ -21,7 +21,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.permissions.PermissionDefault;
@@ -53,6 +52,7 @@ import net.novauniverse.terrasmp.modules.hiddenplayers.HiddenPlayers;
 import net.novauniverse.terrasmp.modules.labymod.TerraSMPLabymodIntegration;
 import net.novauniverse.terrasmp.pluginmessagelisteners.WDLBlocker;
 import net.novauniverse.terrasmp.scoreboard.TerraSMPBoardProvider;
+import net.novauniverse.terrasmp.utils.CombatTagPlusUtils;
 import net.novauniverse.terrasmp.utils.PlayerMessages;
 import net.zeeraa.novacore.commons.async.AsyncManager;
 import net.zeeraa.novacore.commons.log.Log;
@@ -298,6 +298,20 @@ public class TerraSMP extends JavaPlugin implements Listener {
 			e.printStackTrace();
 			Log.error("TerraSMP", "Failed to start api on port " + apiPort);
 		}
+		
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				Log.info("TerraSMP", "Trying to init CombatTagPlus");
+				CombatTagPlusUtils.init();
+				
+				if(CombatTagPlusUtils.isAvailable()) {
+					Log.info("TerraSMP", "CombatTagPlus has been initiated");
+				} else {
+					Log.error("TerraSMP","Failed to initiate CombatTagPlus");
+				}
+			}
+		}.runTask(this);
 	}
 
 	@Override

@@ -76,6 +76,17 @@
 		</plugins>
 	</build>
 
+	<distributionManagement>
+		<snapshotRepository>
+			<id>novauniverse</id>
+			<url>https://nexus.novauniverse.net/repository/novauniverse/</url>
+		</snapshotRepository>
+		<repository>
+			<id>novauniverse</id>
+			<url>https://nexus.novauniverse.net/repository/novauniverse/</url>
+		</repository>
+	</distributionManagement>
+
 	<repositories>
 		<repository>
 			<id>spigot-repo</id>
@@ -174,6 +185,12 @@
 			<artifactId>VillagerGUIApi</artifactId>
 			<version>0.0.1-20210330.200030-1</version>
 			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>net.novauniverse.dependencies</groupId>
+			<artifactId>CombatTagPlus</artifactId>
+			<version>1.0.0</version>
 		</dependency>
 
 		<!--<dependency> <groupId>net.labymod</groupId> <artifactId>LabyApi</artifactId> 

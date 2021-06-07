@@ -3,6 +3,7 @@ name: TerraSMP
 description: TerraSMP Plugin
 version: 1.0
 
+softdepend: CombatTagPlus
 depend: [NovaCore, Factions, LabyApi, VillagerGUIApi]
 
 permissions:
