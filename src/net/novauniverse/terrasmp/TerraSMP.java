@@ -363,12 +363,6 @@ public class TerraSMP extends JavaPlugin implements Listener {
 		e.setQuitMessage(PlayerMessages.getLeaveMessage(player));
 	}
 
-	@EventHandler(priority = EventPriority.LOWEST)
-	public void onPlayerDeath(PlayerDeathEvent e) {
-		String newMessage = ChatColor.DARK_GRAY + "[" + ChatColor.RED + ChatColor.BOLD + "*" + ChatColor.RESET + ChatColor.DARK_GRAY + "] " + ChatColor.RED + e.getDeathMessage();
-		e.setDeathMessage(newMessage);
-	}
-
 	public static void setStarterContinent(Player player, Continent continent) {
 		PlayerDataManager.getPlayerData(player.getUniqueId()).setStarterContinent(continent.getName());
 		PlayerDataManager.savePlayerData(player.getUniqueId());
