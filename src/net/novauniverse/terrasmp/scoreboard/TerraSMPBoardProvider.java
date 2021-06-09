@@ -94,7 +94,7 @@ public class TerraSMPBoardProvider extends NovaModule implements BoardProvider, 
 
 		if (data != null) {
 			lines.add(ChatColor.GOLD + "Date: " + ChatColor.AQUA + TerraSMPTime.getInstance().getScoreboardDate());
-			lines.add("");
+			lines.add(data.isCombatTagged() ? ChatColor.RED + TextUtils.ICON_WARNING + " Combat tagged " + TextUtils.ICON_WARNING : "");
 			lines.add(data.getAtLocation());
 			lines.add(ChatColor.GOLD + "Facing: " + ChatColor.AQUA + TerraSMPUtils.getCardinalDirection(player));
 			lines.add("");
@@ -123,7 +123,7 @@ public class TerraSMPBoardProvider extends NovaModule implements BoardProvider, 
 	public List<ScoreboardModifier> getModifiers() {
 		return modifiers;
 	}
-	
+
 	public void addModifier(ScoreboardModifier modifier) {
 		modifiers.add(modifier);
 	}

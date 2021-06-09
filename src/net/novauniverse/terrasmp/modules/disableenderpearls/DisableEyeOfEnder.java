@@ -1,4 +1,4 @@
-package net.novauniverse.terrasmp.modules.disableeyeofender;
+package net.novauniverse.terrasmp.modules.disableenderpearls;
 
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;

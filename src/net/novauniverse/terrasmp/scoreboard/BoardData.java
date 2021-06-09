@@ -6,6 +6,7 @@ public class BoardData {
 	private String power;
 	private String factionPower;
 	private String ping;
+	private boolean combatTagged;
 
 	public BoardData() {
 		this.atLocation = "";
@@ -13,6 +14,7 @@ public class BoardData {
 		this.power = "";
 		this.factionPower = "";
 		this.ping = "";
+		this.combatTagged = false;
 	}
 	
 	public void setAtLocation(String atLocation) {
@@ -53,5 +55,13 @@ public class BoardData {
 	
 	public void setPing(String ping) {
 		this.ping = ping;
+	}
+	
+	public boolean isCombatTagged() {
+		return combatTagged;
+	}
+	
+	public void setCombatTagged(boolean combatTagged) {
+		this.combatTagged = combatTagged;
 	}
 }
