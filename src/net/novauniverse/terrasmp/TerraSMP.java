@@ -2,7 +2,9 @@ package net.novauniverse.terrasmp;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import javax.annotation.Nullable;
 
@@ -36,8 +38,12 @@ import me.missionary.board.BoardManager;
 import me.missionary.board.settings.BoardSettings;
 import me.missionary.board.settings.ScoreDirection;
 import net.novauniverse.terrasmp.api.WebServer;
+import net.novauniverse.terrasmp.commands.flag.FlagCommand;
+import net.novauniverse.terrasmp.commands.givemeadebugstick.GiveMeADebugStick;
+import net.novauniverse.terrasmp.commands.hat.HatCommand;
 import net.novauniverse.terrasmp.commands.invitetofaction.InviteToFactionCommand;
 import net.novauniverse.terrasmp.commands.map.MapCommand;
+import net.novauniverse.terrasmp.commands.processterrasmppurchase.ProcessTerraSMPPurchaseCommand;
 import net.novauniverse.terrasmp.commands.removebed.RemoveBedCommand;
 import net.novauniverse.terrasmp.commands.shop.ShopCommand;
 import net.novauniverse.terrasmp.commands.systemmessage.SystemMessageCommand;
@@ -54,7 +60,6 @@ import net.novauniverse.terrasmp.pluginmessagelisteners.WDLBlocker;
 import net.novauniverse.terrasmp.scoreboard.TerraSMPBoardProvider;
 import net.novauniverse.terrasmp.utils.CombatTagPlusUtils;
 import net.novauniverse.terrasmp.utils.PlayerMessages;
-import net.zeeraa.novacore.commons.async.AsyncManager;
 import net.zeeraa.novacore.commons.log.Log;
 import net.zeeraa.novacore.commons.utils.JSONFileUtils;
 import net.zeeraa.novacore.spigot.command.CommandRegistry;
@@ -62,6 +67,8 @@ import net.zeeraa.novacore.spigot.module.ModuleManager;
 import net.zeeraa.novacore.spigot.permission.PermissionRegistrator;
 
 public class TerraSMP extends JavaPlugin implements Listener {
+	public final static List<String> COUNTRY_CODES = new ArrayList<String>();
+
 	private static TerraSMP instance;
 
 	private File playerDataFolder;
@@ -173,6 +180,15 @@ public class TerraSMP extends JavaPlugin implements Listener {
 		systemMessage = null;
 		systemMessageBar = null;
 
+		String[] locales = Locale.getISOCountries();
+
+		for (String countryCode : locales) {
+
+			Locale obj = new Locale("", countryCode);
+
+			COUNTRY_CODES.add(obj.getCountry().toUpperCase());
+		}
+
 		try {
 			FileUtils.forceMkdir(getDataFolder());
 			FileUtils.forceMkdir(playerDataFolder);
@@ -236,6 +252,10 @@ public class TerraSMP extends JavaPlugin implements Listener {
 		CommandRegistry.registerCommand(new WipePlayerDataCommand());
 		CommandRegistry.registerCommand(new ShopCommand());
 		CommandRegistry.registerCommand(new TerraSMPCommand());
+		CommandRegistry.registerCommand(new FlagCommand());
+		CommandRegistry.registerCommand(new ProcessTerraSMPPurchaseCommand());
+		CommandRegistry.registerCommand(new HatCommand());
+		CommandRegistry.registerCommand(new GiveMeADebugStick());
 
 		WDLBlocker wdlBlocker = new WDLBlocker();
 
@@ -298,17 +318,17 @@ public class TerraSMP extends JavaPlugin implements Listener {
 			e.printStackTrace();
 			Log.error("TerraSMP", "Failed to start api on port " + apiPort);
 		}
-		
+
 		new BukkitRunnable() {
 			@Override
 			public void run() {
 				Log.info("TerraSMP", "Trying to init CombatTagPlus");
 				CombatTagPlusUtils.init();
-				
-				if(CombatTagPlusUtils.isAvailable()) {
+
+				if (CombatTagPlusUtils.isAvailable()) {
 					Log.info("TerraSMP", "CombatTagPlus has been initiated");
 				} else {
-					Log.error("TerraSMP","Failed to initiate CombatTagPlus");
+					Log.error("TerraSMP", "Failed to initiate CombatTagPlus");
 				}
 			}
 		}.runTask(this);
@@ -328,6 +348,7 @@ public class TerraSMP extends JavaPlugin implements Listener {
 
 	@EventHandler(priority = EventPriority.HIGH)
 	public void onPlayerJoin(PlayerJoinEvent e) {
+		Log.trace(getName(), e.getClass().getName());
 		Player player = e.getPlayer();
 
 		if (systemMessageBar != null) {
@@ -338,26 +359,28 @@ public class TerraSMP extends JavaPlugin implements Listener {
 
 		PlayerData playerData = PlayerDataManager.getPlayerData(player.getUniqueId());
 
-		if (getContinent(playerData.getStarterContinent()) == null) {
-			AsyncManager.runSync(new Runnable() {
-				@Override
-				public void run() {
-					HiddenPlayers.getInstance().hidePlayer(player);
-					player.sendMessage(ChatColor.GOLD + "Please select your starter continent");
-					player.sendMessage(ChatColor.GOLD + "If you are using labymod the continent selector screen should open within 5 seconds");
-					player.teleport(spawnLocation);
-
-					new BukkitRunnable() {
-						@Override
-						public void run() {
-							if (!PlayerDataManager.getPlayerData(player.getUniqueId()).hasStarterContinent()) {
-								TerraSMPLabymodIntegration.getInstance().openContinentSelectorScreen(e.getPlayer());
-							}
-						}
-					}.runTaskLater(TerraSMP.getInstance(), 100L);
-				}
-			}, 4L);
+		if (player.hasPermission("terrasmp.customflag")) {
+			String flag = playerData.getFlag();
+			if (flag != null) {
+				TerraSMPLabymodIntegration.getInstance().getFlags().put(player.getUniqueId(), flag);
+			}
 		}
+
+		/*
+		 * if (getContinent(playerData.getStarterContinent()) == null) {
+		 * HiddenPlayers.getInstance().hidePlayer(player);
+		 * player.sendMessage(ChatColor.GOLD + "Please select your starter continent");
+		 * player.sendMessage(ChatColor.GOLD +
+		 * "If you are using labymod the continent selector screen should open within 5 seconds"
+		 * ); player.teleport(spawnLocation);
+		 * 
+		 * new BukkitRunnable() {
+		 * 
+		 * @Override public void run() { if
+		 * (!PlayerDataManager.getPlayerData(player.getUniqueId()).hasStarterContinent()
+		 * ) { TerraSMPLabymodIntegration.getInstance().openContinentSelectorScreen(e.
+		 * getPlayer()); } } }.runTaskLater(TerraSMP.getInstance(), 100L); }
+		 */
 
 		e.setJoinMessage(PlayerMessages.getJoinMessage(player));
 	}

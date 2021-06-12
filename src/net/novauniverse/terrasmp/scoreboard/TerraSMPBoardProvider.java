@@ -23,6 +23,7 @@ import com.massivecraft.massivecore.ps.PS;
 
 import me.missionary.board.provider.BoardProvider;
 import net.novauniverse.terrasmp.modules.terrasmptime.TerraSMPTime;
+import net.novauniverse.terrasmp.utils.CombatTagPlusUtils;
 import net.novauniverse.terrasmp.utils.TerraSMPUtils;
 import net.zeeraa.novacore.commons.log.Log;
 import net.zeeraa.novacore.commons.tasks.Task;
@@ -37,7 +38,10 @@ public class TerraSMPBoardProvider extends NovaModule implements BoardProvider, 
 	private static TerraSMPBoardProvider instance;
 	private HashMap<UUID, BoardData> boardDataMap;
 	private Task task;
+	private Task blinkTask;
 	private String tspString;
+
+	private boolean blinkState;
 
 	private List<ScoreboardModifier> modifiers;
 
@@ -56,6 +60,7 @@ public class TerraSMPBoardProvider extends NovaModule implements BoardProvider, 
 		modifiers = new ArrayList<>();
 		boardDataMap = new HashMap<>();
 		tspString = ChatColor.DARK_GRAY + "Unknown";
+		blinkState = false;
 		task = new SimpleTask(new Runnable() {
 			@Override
 			public void run() {
@@ -72,16 +77,29 @@ public class TerraSMPBoardProvider extends NovaModule implements BoardProvider, 
 				}
 			}
 		}, 10L);
+
+		blinkTask = new SimpleTask(new Runnable() {
+			@Override
+			public void run() {
+				blinkState = !blinkState;
+			}
+		}, 10L);
 	}
 
 	@Override
 	public void onEnable() throws Exception {
 		Task.tryStartTask(task);
+		Task.tryStartTask(blinkTask);
 	}
 
 	@Override
 	public void onDisable() throws Exception {
 		Task.tryStopTask(task);
+		Task.tryStopTask(blinkTask);
+	}
+
+	private String blink(ChatColor color1, ChatColor color2) {
+		return "" + (blinkState ? color1 : color2);
 	}
 
 	@Override
@@ -94,7 +112,7 @@ public class TerraSMPBoardProvider extends NovaModule implements BoardProvider, 
 
 		if (data != null) {
 			lines.add(ChatColor.GOLD + "Date: " + ChatColor.AQUA + TerraSMPTime.getInstance().getScoreboardDate());
-			lines.add(data.isCombatTagged() ? ChatColor.RED + TextUtils.ICON_WARNING + " Combat tagged " + TextUtils.ICON_WARNING : "");
+			lines.add(data.isCombatTagged() ? blink(ChatColor.RED, ChatColor.YELLOW) + TextUtils.ICON_WARNING + ChatColor.RED + " Combat tagged " + blink(ChatColor.RED, ChatColor.YELLOW) + TextUtils.ICON_WARNING : "");
 			lines.add(data.getAtLocation());
 			lines.add(ChatColor.GOLD + "Facing: " + ChatColor.AQUA + TerraSMPUtils.getCardinalDirection(player));
 			lines.add("");
@@ -146,6 +164,10 @@ public class TerraSMPBoardProvider extends NovaModule implements BoardProvider, 
 			boardData = new BoardData();
 
 			boardDataMap.put(player.getUniqueId(), boardData);
+		}
+
+		if (CombatTagPlusUtils.isAvailable()) {
+			boardData.setCombatTagged(CombatTagPlusUtils.isTagged(player));
 		}
 
 		MPlayer mPlayer = MPlayer.get(player);

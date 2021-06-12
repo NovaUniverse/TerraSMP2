@@ -140,6 +140,12 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
+      <groupId>net.luckperms</groupId>
+      <artifactId>api</artifactId>
+      <version>5.3</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
       <groupId>io.netty</groupId>
       <artifactId>netty-all</artifactId>
       <version>4.1.42.Final</version>
@@ -152,4 +158,14 @@
       <scope>provided</scope>
     </dependency>
   </dependencies>
+  <distributionManagement>
+    <repository>
+      <id>novauniverse</id>
+      <url>https://nexus.novauniverse.net/repository/novauniverse/</url>
+    </repository>
+    <snapshotRepository>
+      <id>novauniverse</id>
+      <url>https://nexus.novauniverse.net/repository/novauniverse/</url>
+    </snapshotRepository>
+  </distributionManagement>
 </project>

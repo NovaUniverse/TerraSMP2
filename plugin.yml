@@ -3,8 +3,8 @@ name: TerraSMP
 description: TerraSMP Plugin
 version: 1.0
 
-softdepend: CombatTagPlus
-depend: [NovaCore, Factions, LabyApi, VillagerGUIApi]
+softdepend: [CombatTagPlus]
+depend: [NovaCore, Factions, LabyApi, VillagerGUIApi, LuckPerms]
 
 permissions:
    terrasmp.sign.selectcontinent:
@@ -15,6 +15,17 @@ permissions:
       default: false
    terrasmp.noquitmessage:
       description: Hide quit message
+      default: false
+   terrasmp.customflag:
+      description: Set your flag in the tablist
+      default: op
+   terrasmp.coloredchat:
+      description: Use chat colors
+      default: op
+   terrasmp.joinfullserver:
+       description: Allow players to join even if the server is full
+       default: op
+   group.vip:
       default: false
 
 commands:

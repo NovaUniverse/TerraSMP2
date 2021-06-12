@@ -51,7 +51,13 @@ public class TerraSMPLabymodIntegration extends NovaModule implements Listener {
 
 	private Map<UUID, Integer> deathsCache;
 	private Map<UUID, Integer> killsCache;
-	//private Map<UUID, Map<UUID, String>> playerTitleCache;
+	private Map<UUID, String> flags;
+
+	// private Map<UUID, Map<UUID, String>> playerTitleCache;
+
+	public Map<UUID, String> getFlags() {
+		return flags;
+	}
 
 	public static TerraSMPLabymodIntegration getInstance() {
 		return instance;
@@ -68,7 +74,8 @@ public class TerraSMPLabymodIntegration extends NovaModule implements Listener {
 
 		this.deathsCache = new HashMap<>();
 		this.killsCache = new HashMap<>();
-		//this.playerTitleCache = new HashMap<>();
+		this.flags = new HashMap<UUID, String>();
+		// this.playerTitleCache = new HashMap<>();
 
 		this.task = new SimpleTask(new Runnable() {
 			@Override
@@ -76,6 +83,7 @@ public class TerraSMPLabymodIntegration extends NovaModule implements Listener {
 				for (Player player : Bukkit.getServer().getOnlinePlayers()) {
 					sendPlayerTitles(player);
 					updateKDR(player);
+					updateFlags(player);
 				}
 			}
 		}, 100L);
@@ -85,7 +93,8 @@ public class TerraSMPLabymodIntegration extends NovaModule implements Listener {
 	public void onEnable() throws Exception {
 		deathsCache.clear();
 		killsCache.clear();
-		//playerTitleCache.clear();
+		flags.clear();
+		// playerTitleCache.clear();
 		Task.tryStartTask(task);
 	}
 
@@ -94,7 +103,8 @@ public class TerraSMPLabymodIntegration extends NovaModule implements Listener {
 		Task.tryStopTask(task);
 		deathsCache.clear();
 		killsCache.clear();
-		//playerTitleCache.clear();
+		flags.clear();
+		// playerTitleCache.clear();
 	}
 
 	@EventHandler(priority = EventPriority.NORMAL)
@@ -111,7 +121,8 @@ public class TerraSMPLabymodIntegration extends NovaModule implements Listener {
 	public void onPlayerQuit(PlayerQuitEvent e) {
 		deathsCache.remove(e.getPlayer().getUniqueId());
 		killsCache.remove(e.getPlayer().getUniqueId());
-		//playerTitleCache.remove(e.getPlayer().getUniqueId());
+		flags.remove(e.getPlayer().getUniqueId());
+		// playerTitleCache.remove(e.getPlayer().getUniqueId());
 
 		this.sendCurrentPlayingGamemode(e.getPlayer(), false, "TerraSMP");
 	}
@@ -307,6 +318,24 @@ public class TerraSMPLabymodIntegration extends NovaModule implements Listener {
 		JsonObject object = screen.toJsonObject(EnumScreenAction.OPEN);
 
 		LabyModProtocol.sendLabyModMessage(player, "screen", object);
+	}
+
+	public void updateFlags(Player player) {
+		JsonObject flagPacket = new JsonObject();
+
+		JsonArray users = new JsonArray();
+
+		for (UUID uuid : flags.keySet()) {
+			JsonObject userObject = new JsonObject();
+			userObject.addProperty("uuid", uuid.toString());
+			userObject.addProperty("code", flags.get(uuid));
+			users.add(userObject);
+		}
+
+		// Add array to flag object packet
+		flagPacket.add("users", users);
+
+		LabyModProtocol.sendLabyModMessage(player, "language_flag", flagPacket);
 	}
 
 	public void setMiddleClickActions(Player player) {

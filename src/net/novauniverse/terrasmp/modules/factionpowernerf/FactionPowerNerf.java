@@ -68,7 +68,7 @@ public class FactionPowerNerf extends NovaModule implements Listener {
 				return;
 			}
 
-			int loss = extra * 10;
+			int loss = extra * 20;
 			
 			double newPower = mPlayer.getPower() - ((double) loss);
 
