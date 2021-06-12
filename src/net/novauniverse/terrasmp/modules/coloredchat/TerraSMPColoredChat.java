@@ -9,7 +9,7 @@ import net.zeeraa.novacore.spigot.module.NovaModule;
 import net.zeeraa.novacore.spigot.module.annotations.NovaAutoLoad;
 
 @NovaAutoLoad(shouldEnable = true)
-public class HiddenJoinQuitMessages extends NovaModule implements Listener {
+public class TerraSMPColoredChat extends NovaModule implements Listener {
 	@Override
 	public String getName() {
 		return "TerraSMPColoredChat";
