@@ -50,6 +50,14 @@ public class ProcessTerraSMPPurchaseCommand extends NovaCommand {
 	public void processPurchase(Player player, String packageName) {
 		player.sendMessage(ChatColor.GOLD + "Processing purchase...");
 		switch (packageName.toLowerCase()) {
+		case "vip365":
+			addVipDays(player, 365);
+			break;
+		
+		case "vip90":
+			addVipDays(player, 90);
+			break;
+		
 		case "vip60":
 			addVipDays(player, 60);
 			break;
