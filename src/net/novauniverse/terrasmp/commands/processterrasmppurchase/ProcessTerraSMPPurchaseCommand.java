@@ -12,6 +12,7 @@ import org.bukkit.permissions.PermissionDefault;
 import net.novauniverse.terrasmp.TerraSMP;
 import net.novauniverse.terrasmp.data.PlayerData;
 import net.novauniverse.terrasmp.data.PlayerDataManager;
+import net.novauniverse.terrasmp.utils.PermissionsUtils;
 import net.zeeraa.novacore.commons.log.Log;
 import net.zeeraa.novacore.commons.utils.DateTimeUtils;
 import net.zeeraa.novacore.spigot.command.AllowedSenders;
@@ -53,25 +54,30 @@ public class ProcessTerraSMPPurchaseCommand extends NovaCommand {
 		case "vip365":
 			addVipDays(player, 365);
 			break;
-		
+
 		case "vip90":
 			addVipDays(player, 90);
 			break;
-		
+
 		case "vip60":
 			addVipDays(player, 60);
 			break;
-			
+
 		case "vip30":
 			addVipDays(player, 30);
 			break;
-			
+
 		case "vip7":
 			addVipDays(player, 7);
 			break;
-			
+
 		case "vip3":
 			addVipDays(player, 3);
+			break;
+
+		case "hat":
+			PermissionsUtils.addNode(player, "terrasmp.command.hat");
+			player.sendMessage(ChatColor.GOLD + "You now have the " + ChatColor.AQUA + "/hat" + ChatColor.GOLD + " command");
 			break;
 
 		default:
