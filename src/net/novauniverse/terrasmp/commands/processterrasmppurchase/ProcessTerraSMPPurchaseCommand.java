@@ -66,6 +66,10 @@ public class ProcessTerraSMPPurchaseCommand extends NovaCommand {
 			addVipDays(player, 3);
 			break;
 
+		case "vip1":
+			addVipDays(player, 1);
+			break;
+			
 		default:
 			player.sendMessage(ChatColor.RED + "Could not process your purchase. Please contact an admin about this");
 			Log.error("ProcessTerraSMPPurchaseCommand", "Invalid package name " + packageName);

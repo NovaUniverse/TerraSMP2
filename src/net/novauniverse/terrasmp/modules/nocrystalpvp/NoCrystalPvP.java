@@ -12,7 +12,7 @@ import net.zeeraa.novacore.commons.log.Log;
 import net.zeeraa.novacore.spigot.module.NovaModule;
 import net.zeeraa.novacore.spigot.module.annotations.NovaAutoLoad;
 
-@NovaAutoLoad(shouldEnable = true)
+@NovaAutoLoad(shouldEnable = false)
 public class NoCrystalPvP extends NovaModule implements Listener {
 	@Override
 	public String getName() {

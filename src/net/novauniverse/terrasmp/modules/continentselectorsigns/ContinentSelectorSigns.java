@@ -57,7 +57,7 @@ public class ContinentSelectorSigns extends NovaModule implements Listener {
 	public void onPlayerInteract(PlayerInteractEvent e) {
 		if (e.getAction() == Action.RIGHT_CLICK_BLOCK /* || e.getAction() == Action.LEFT_CLICK_BLOCK */) {
 			if (e.getClickedBlock().getType() == Material.SIGN_POST || e.getClickedBlock().getType() == Material.WALL_SIGN) {
-				Log.trace(getName(), e.getPlayer() + " interacted with sign. " + e.getAction().name() + ". Canceled: " + e.isCancelled());
+				//Log.trace(getName(), e.getPlayer() + " interacted with sign. " + e.getAction().name() + ". Canceled: " + e.isCancelled());
 
 				if (e.getPlayer().getGameMode() != GameMode.SPECTATOR) {
 					if (e.getClickedBlock().getState() instanceof Sign) {
