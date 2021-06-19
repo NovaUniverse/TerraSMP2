@@ -26,7 +26,7 @@ public class FakeLeaveCommand extends NovaSubCommand {
 	public boolean execute(CommandSender sender, String commandLabel, String[] args) {
 		Player player = (Player) sender;
 
-		Bukkit.getServer().broadcastMessage(PlayerMessages.getJoinMessage(player));
+		Bukkit.getServer().broadcastMessage(PlayerMessages.getLeaveMessage(player));
 		Bukkit.getServer().getConsoleSender().sendMessage(ChatColor.AQUA + "The join message above for " + player.getName() + " is fake");
 
 		return true;
