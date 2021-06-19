@@ -113,7 +113,7 @@ public class StatusHandler implements HttpHandler {
 				ppower.put("max", player.getPowerMax());
 				ppower.put("boost", player.getPowerBoost());
 
-				jp.put("power", power);
+				jp.put("power", ppower);
 
 				fPlayers.put(jp);
 			}
