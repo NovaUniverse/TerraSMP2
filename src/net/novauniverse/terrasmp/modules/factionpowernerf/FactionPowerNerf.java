@@ -32,7 +32,7 @@ public class FactionPowerNerf extends NovaModule implements Listener {
 	@Override
 	public void onLoad() {
 		FactionPowerNerf.instance = this;
-		this.playerLimit = 10;
+		this.playerLimit = 7;
 	}
 
 	public int getPlayerLimit() {
@@ -68,7 +68,13 @@ public class FactionPowerNerf extends NovaModule implements Listener {
 				return;
 			}
 
-			int loss = extra * 20;
+			//int loss = extra * 20;
+			
+			int loss = 0;
+			
+			for(int i = 0; i< extra; i++) {
+				loss += 25 * (i + 1);
+			}
 			
 			double newPower = mPlayer.getPower() - ((double) loss);
 
