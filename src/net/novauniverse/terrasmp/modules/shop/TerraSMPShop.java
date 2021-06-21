@@ -39,7 +39,7 @@ public class TerraSMPShop extends NovaModule {
 		trades.add(new VillagerTrade(emeralds(2), new ItemBuilder(Material.QUARTZ).setAmount(16).build(), MAX_TRADE_USES));
 		trades.add(new VillagerTrade(emeralds(64), emeralds(64), new ItemBuilder(Material.TOTEM).setAmount(1).build(), MAX_TRADE_USES));
 		trades.add(new VillagerTrade(emeralds(10), new ItemBuilder(Material.SOUL_SAND).setAmount(16).build(), MAX_TRADE_USES));
-		trades.add(new VillagerTrade(emeralds(10), new ItemBuilder(Material.BLAZE_ROD).setAmount(1).build(), MAX_TRADE_USES));
+		trades.add(new VillagerTrade(emeralds(5), new ItemBuilder(Material.BLAZE_ROD).setAmount(2).build(), MAX_TRADE_USES));
 		trades.add(new VillagerTrade(emeralds(5), new ItemBuilder(Material.ENDER_PEARL).setAmount(2).build(), MAX_TRADE_USES));
 		trades.add(new VillagerTrade(emeralds(5), new ItemBuilder(Material.GHAST_TEAR).setAmount(1).build(), MAX_TRADE_USES));
 		trades.add(new VillagerTrade(emeralds(5), new ItemBuilder(Material.MAGMA_CREAM).setAmount(1).build(), MAX_TRADE_USES));

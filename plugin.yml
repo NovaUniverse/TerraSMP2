@@ -1,7 +1,7 @@
 main: net.novauniverse.terrasmp.TerraSMP
 name: TerraSMP
 description: TerraSMP Plugin
-version: 1.0
+version: 1.1
 
 softdepend: [CombatTagPlus]
 depend: [NovaCore, Factions, LabyApi, VillagerGUIApi, LuckPerms]
