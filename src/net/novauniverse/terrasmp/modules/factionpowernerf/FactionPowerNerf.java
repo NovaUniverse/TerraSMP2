@@ -55,7 +55,7 @@ public class FactionPowerNerf extends NovaModule implements Listener {
 		MPlayer mPlayer = MPlayer.get(player);
 
 		Faction faction = mPlayer.getFaction();
-
+		
 		int players = faction.getMPlayers().size();
 
 		Log.debug(getName(), player.getName() + " died. They are in a faction with " + players + " members and the nerf limit is " + playerLimit + ". Output of (players > playerLimit) is " + (players > playerLimit));

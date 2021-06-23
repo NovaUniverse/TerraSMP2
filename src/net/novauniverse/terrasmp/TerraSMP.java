@@ -56,6 +56,7 @@ import net.novauniverse.terrasmp.data.PlayerDataManager;
 import net.novauniverse.terrasmp.modules.factionpowernerf.FactionPowerNerf;
 import net.novauniverse.terrasmp.modules.hiddenplayers.HiddenPlayers;
 import net.novauniverse.terrasmp.modules.labymod.TerraSMPLabymodIntegration;
+import net.novauniverse.terrasmp.modules.requirelabymod.RequireLabymod;
 import net.novauniverse.terrasmp.pluginmessagelisteners.WDLBlocker;
 import net.novauniverse.terrasmp.scoreboard.TerraSMPBoardProvider;
 import net.novauniverse.terrasmp.utils.CombatTagPlusUtils;
@@ -257,6 +258,9 @@ public class TerraSMP extends JavaPlugin implements Listener {
 		CommandRegistry.registerCommand(new HatCommand());
 		CommandRegistry.registerCommand(new GiveMeADebugStick());
 
+		Bukkit.getServer().getMessenger().registerIncomingPluginChannel(this, "labymod3:main", ModuleManager.getModuleCast(RequireLabymod.class));
+		Bukkit.getServer().getMessenger().registerIncomingPluginChannel(this, "LMC", ModuleManager.getModuleCast(RequireLabymod.class));
+		
 		WDLBlocker wdlBlocker = new WDLBlocker();
 
 		Bukkit.getServer().getMessenger().registerIncomingPluginChannel((Plugin) this, "WDL|INIT", wdlBlocker);
