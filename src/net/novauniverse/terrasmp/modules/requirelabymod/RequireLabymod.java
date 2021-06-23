@@ -69,7 +69,7 @@ public class RequireLabymod extends NovaModule implements Listener, PluginMessag
 					Player player = Bukkit.getServer().getPlayer(uuid);
 					if (player != null) {
 						if (player.isOnline()) {
-							player.sendMessage("You need LabyMod to be able to play on this server");
+							player.kickPlayer("You need LabyMod to be able to play on this server");
 						}
 					}
 				}
