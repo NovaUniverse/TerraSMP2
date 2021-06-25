@@ -42,7 +42,7 @@ import net.novauniverse.terrasmp.commands.flag.FlagCommand;
 import net.novauniverse.terrasmp.commands.givemeadebugstick.GiveMeADebugStick;
 import net.novauniverse.terrasmp.commands.hat.HatCommand;
 import net.novauniverse.terrasmp.commands.invitetofaction.InviteToFactionCommand;
-import net.novauniverse.terrasmp.commands.map.MapCommand;
+import net.novauniverse.terrasmp.commands.map.StuckCommand;
 import net.novauniverse.terrasmp.commands.processterrasmppurchase.ProcessTerraSMPPurchaseCommand;
 import net.novauniverse.terrasmp.commands.removebed.RemoveBedCommand;
 import net.novauniverse.terrasmp.commands.shop.ShopCommand;
@@ -248,7 +248,7 @@ public class TerraSMP extends JavaPlugin implements Listener {
 
 		CommandRegistry.registerCommand(new SystemMessageCommand());
 		CommandRegistry.registerCommand(new RemoveBedCommand());
-		CommandRegistry.registerCommand(new MapCommand());
+		CommandRegistry.registerCommand(new StuckCommand());
 		CommandRegistry.registerCommand(new InviteToFactionCommand());
 		CommandRegistry.registerCommand(new WipePlayerDataCommand());
 		CommandRegistry.registerCommand(new ShopCommand());
@@ -257,10 +257,11 @@ public class TerraSMP extends JavaPlugin implements Listener {
 		CommandRegistry.registerCommand(new ProcessTerraSMPPurchaseCommand());
 		CommandRegistry.registerCommand(new HatCommand());
 		CommandRegistry.registerCommand(new GiveMeADebugStick());
+		CommandRegistry.registerCommand(new StuckCommand());
 
 		Bukkit.getServer().getMessenger().registerIncomingPluginChannel(this, "labymod3:main", ModuleManager.getModuleCast(RequireLabymod.class));
 		Bukkit.getServer().getMessenger().registerIncomingPluginChannel(this, "LMC", ModuleManager.getModuleCast(RequireLabymod.class));
-		
+
 		WDLBlocker wdlBlocker = new WDLBlocker();
 
 		Bukkit.getServer().getMessenger().registerIncomingPluginChannel((Plugin) this, "WDL|INIT", wdlBlocker);

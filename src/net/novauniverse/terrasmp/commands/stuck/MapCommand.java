@@ -1,4 +1,4 @@
-package net.novauniverse.terrasmp.commands.map;
+package net.novauniverse.terrasmp.commands.stuck;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
