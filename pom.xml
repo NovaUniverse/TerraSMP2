@@ -107,6 +107,8 @@
 			<id>masecla-repo</id>
 			<url>https://masecla.dev/nexus/repository/maven-snapshots/</url>
 		</repository>
+
+		
 	</repositories>
 
 	<dependencies>
